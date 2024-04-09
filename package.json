@@ -1,0 +1,28 @@
+{
+  "name": "light-server",
+  "version": "1.0.0",
+  "description": "react-express-modbus",
+  "main": "app.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node app.js",
+    "server": "nodemon app.js",
+    "client": "npm run dev --prefix client",
+    "client:install": "npm install --prefix client",
+    "client:build": "npm run build --prefix client",
+    "dev": "cross-env NODE_ENV=development concurrently \" npm run server\" \"npm run client\""
+  },
+  "author": "If_noise",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "config": "^3.3.11",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "jsmodbus": "^4.0.10"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.0"
+  }
+}
