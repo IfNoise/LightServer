@@ -18,7 +18,8 @@
     "config": "^3.3.11",
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "jsmodbus": "^4.0.10"
+    "jsmodbus": "^4.0.10",
+    "node-localstorage": "^3.0.5"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

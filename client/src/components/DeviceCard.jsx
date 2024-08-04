@@ -1,39 +1,48 @@
-import { Button, Card, CardActions, CardContent, CardHeader, Stack, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Checkbox,
+} from "@mui/material";
 import PropTypes from "prop-types";
+import LockIcon from "@mui/icons-material/Lock";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
+import { useRemoveDeviceMutation } from "../store/lightApi";
 
-const DeviceCard = ({ device }) => {
-  const { address, name, ports } = device;
 
+const DeviceCard = ({ device}) => {
+  const { name, host, port} = device.options;
+  const [removeDevice] = useRemoveDeviceMutation();
+  const {ports}=device;
+  const handleRemoveDevice = () => {
+    removeDevice(name);
+  }
   return (
     <Card>
-      <CardHeader title={name} /> 
+      <CardHeader
+        title={name}
+        subheader={`${host}:${port}`}
+        action={<Checkbox icon={<LockIcon />} checkedIcon={<LockOpenIcon/>} />}
+      />
       <CardContent>
-        <Typography variant="body2" color="textSecondary" component="p">Address {address}</Typography>
-        <Stack spacing={2}>
-          {ports.map((port,index) => (
-            <Card key={index}>
-              <CardContent>
-                <Typography variant="body2" color="textSecondary" component="p">Port {port.name}</Typography>
-                <Typography variant="body2" color="textSecondary" component="p">Day Brightness {port.dayBrightness}</Typography>
-                <Typography variant="body2" color="textSecondary" component="p">State {port.state}</Typography>
-                <Typography variant="body2" color="textSecondary" component="p">Timer {port.timer}</Typography>
-              </CardContent>
-              <CardActions>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="primary">settings</Button>
-              </CardActions>
-            </Card>
-          ))}
-        </Stack>
       </CardContent>
+      <CardActions>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={handleRemoveDevice}
+        >Delete</Button>
+
+      </CardActions>
     </Card>
   );
 }
-
-DeviceCard.propTypes={
+DeviceCard.propTypes = {
   device: PropTypes.object.isRequired,
-}
+};
+
+
 
 export default DeviceCard;

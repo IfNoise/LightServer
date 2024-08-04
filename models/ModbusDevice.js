@@ -1,105 +1,136 @@
-
+// Description: ModbusDevice model to interact with modbus devices.
 const modbus = require("jsmodbus");
 const net = require("net");
 
 class ModbusDevice {
-  constructor (name=null, address=null,port="502",timeout=1000) {
+  constructor(name, address , port = "502", timeout = 1000) {
     this.name = name;
-    this.options={name:name,host:address,port:port,timeout:timeout}
-    this.ports=[];
+    this.options = { name: name, host: address, port: port, timeout: timeout };
+    this.ports = null;
+    this.timer=null;
   }
-  
+  init(){
+    this.requestState().then((ports)=>{
+      this.ports=ports;
+    })
+    this.timer=setInterval(()=>{
+      this.requestState().then((ports)=>{
+        this.ports=ports;
+      })
+    },30000) 
+  }
   requestState() {
-    return new Promise((resolve, reject) => {
-      const socket = new net.Socket();
-      const client = new modbus.client.TCP(socket);
-      socket.on("connect", function () {
-        client
-          .readHoldingRegisters(0, 8)
-          .then(function (resp) {
-            this.ports. resp.response._body.valuesAsArray;
-            resolve(this.ports);
-            socket.end();
-          })
-          .catch(function (error) {
+        return  new Promise((resolve, reject) => {
+          try {
+            const socket = new net.Socket();
+            const client = new modbus.client.TCP(socket);
+            socket.on("connect", ()=>{
+              client
+                .readHoldingRegisters(0, 8)
+                .then((resp)=>{
+                  this.ports = resp.response._body.valuesAsArray;
+                  resolve([...this.ports]);
+                  socket.end();
+                })
+                .catch(function (error) {
+                  console.log(error);
+                  reject([]);
+                  socket.end();
+                });
+            });
+            socket.connect(this.options);
+          } catch (e) {
+            console.log(e);
             reject([]);
-            socket.end();
-          });
-      });
-      socket.connect(this.options);
-    });
-  }
+          }
+        }).catch((e) => {
+          console.log(e);
+          return [];
+        });
+      } 
+    
+  
   updatePorts(newState) {
-    return new Promise((resolve, reject) => {
-      const socket = new net.Socket();
-      const client = new modbus.client.TCP(socket);
-      socket.on("connect", function () {
-        client
-          .writeMultipleRegisters(0, newState)
-          .then(function (resp) {
-            resolve(resp.response._body.valuesAsArray);
-            socket.end();
-          })
-          .catch(function () {
-            reject([]);
-            socket.end();
+      return new Promise((resolve, reject) => {
+        try {
+          const socket = new net.Socket();
+          const client = new modbus.client.TCP(socket);
+          socket.on("connect", function () {
+            client
+              .writeMultipleRegisters(0, newState)
+              .then(function (resp) {
+                resolve(resp.response._body.valuesAsArray);
+                socket.end();
+              })
+              .catch(function () {
+                reject([]);
+                socket.end();
+              });
           });
+          socket.connect(this.options);
+        } catch (e) {
+          console.log(e);
+          reject([]);
+        }
+      }).catch((e) => {
+        console.log(e);
+        return [];
       });
-      socket.connect(this.options);
-    });
   }
   updatePort(port, newState) {
-    return new Promise((resolve, reject) => {
-      const socket = new net.Socket();
-      const client = new modbus.client.TCP(socket);
-      socket.on("connect", function () {
-        client
-          .writeSingleRegister(port, newState)
-          .then(function (resp) {
-            resolve(resp.response._body.valuesAsArray);
-            socket.end();
-          })
-          .catch(function () {
-            reject([]);
-            socket.end();
+      return new Promise((resolve, reject) => {
+        try {
+          const socket = new net.Socket();
+          const client = new modbus.client.TCP(socket);
+          socket.on("connect", function () {
+            client
+              .writeSingleRegister(port, newState)
+              .then(function (resp) {
+                resolve(resp.response._body);
+                socket.end();
+              })
+              .catch(function () {
+                reject([]);
+                socket.end();
+              });
           });
+          socket.connect(this.options);
+        } catch (e) {
+          console.log(e);
+          reject([]);
+        }
       });
-      socket.connect(this.options);
-    });
-  }
+    } 
+  
   portState(port) {
     return new Promise((resolve, reject) => {
-      const socket = new net.Socket();
-      const client = new modbus.client.TCP(socket);
-      socket.on("connect", function () {
-        client
-          .readHoldingRegisters(port, 1)
-          .then(function (resp) {
-            resolve(resp.response._body.valuesAsArray);
-            socket.end();
-          })
-          .catch(function () {
-            reject([]);
-            socket.end();
-          });
-      });
-      socket.connect(this.options);
+      try {
+        const socket = new net.Socket();
+        const client = new modbus.client.TCP(socket);
+        socket.on("connect", function () {
+          client
+            .readHoldingRegisters(port, 1)
+            .then(function (resp) {
+              resolve(resp.response._body.valuesAsArray);
+              socket.end();
+            })
+            .catch(function () {
+              
+              socket.end();
+              reject([]);
+            });
+        });
+        socket.connect(this.options);
+      } catch (e) {
+        console.log(e);
+        reject([]);
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+      return [];
     });
   }
 }
-// const socket = new net.Socket();
-  // const client = new modbus.client.TCP(socket);
-  // socket.on("connect", function () {
-  //   client
-  //     .readHoldingRegisters(0, 8)
-  //     .then(function (resp) {
-  //       //res.json({state:resp.response._body.valuesAsArray})
-  //       socket.end();
-  //     })
-  //     .catch(function () {
-  //       res.json({ state: [] });
-  //       socket.end();
-  //     });
-  // });
-  // socket.connect(options);
-  module.exports = ModbusDevice;
+
+module.exports = ModbusDevice;

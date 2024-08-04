@@ -11,7 +11,7 @@ export const store = configureStore({
   reducer,
   preloadedState: reHydrateStore(),
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat([lightApi.middleware,localStorageMiddleware]),
+    getDefaultMiddleware().concat([lightApi.middleware]),
 });
 
 setupListeners(store.dispatch)

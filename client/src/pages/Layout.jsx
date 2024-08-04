@@ -37,11 +37,11 @@ export const Layout = () => {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <MuiAppBar position="fixed"  open={open}>
+      {/* <MuiAppBar position="fixed"  >
         <Toolbar sx={{width:'100%'}}>
             
         </Toolbar>
-       </MuiAppBar>
+       </MuiAppBar> */}
       <Box>
         <Outlet />
         </Box>
