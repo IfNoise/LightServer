@@ -5,12 +5,12 @@ const DeviceManager = require('../models/DeviceManager');
 const deviceManager = DeviceManager.getInstance();
 
 router.get("/", (req, res) => {
-  res.json(DeviceManager.getDevices());
+  res.json(deviceManager.getDevices());
 }
 );
 router.get("/:name", (req, res) => {
   const { name } = req.params;
-  const device = DeviceManager.getDevice(name);
+  const device = deviceManager.getDevice(name);
   if (device) {
     res.json(device.json());
   } else {
@@ -19,7 +19,7 @@ router.get("/:name", (req, res) => {
 });
 router.get("/:name/state", async (req, res) => {
   const { name } = req.params;
-  const device = DeviceManager.getDevice(name);
+  const device = deviceManager.getDevice(name);
   if (device) {
     const state = await device.requestState();
     res.json({state});
