@@ -22,6 +22,7 @@ timerManager.init();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json({ extended: true }));
+app.use("light",express.static(path.join(__dirname, "public")));
 
 app.use("/light/api/devices", require("./routes/devices.route"));
 app.use("/light/api/timers", require("./routes/timers.route"));
@@ -29,8 +30,7 @@ app.use("/light/api/lightChannels", require("./routes/lightChannels.route"));
 
 
 
-  app.use('/light', express.static(path.join(__dirname, 'client', 'dist')))
-
+//
   
 
 
