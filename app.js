@@ -29,11 +29,9 @@ app.use("/light/api/lightChannels", require("./routes/lightChannels.route"));
 
 
 
-  app.use('/light/', express.static(path.join(__dirname, 'client', 'dist')))
+  app.use('/light', express.static(path.join(__dirname, 'client', 'dist')))
 
-  app.get('/light/*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'))
-  })
+  
 
 
 
