@@ -49,8 +49,9 @@ router.post("/remove", (req, res) => {
   }
 });
 
-router.post("/setMaxLevel", (req, res) => {
-  const { name, maxLevel } = req.body;
+router.post("/:name/setMaxLevel", (req, res) => {
+  const { name } = req.params;
+  const { maxLevel } = req.body;
   const channel = channelManager.getChannel(name);
   if (channel) {
     channel.setMaxLevel(maxLevel);
@@ -61,8 +62,9 @@ router.post("/setMaxLevel", (req, res) => {
 }
 );
 
-router.post("/setPort", (req, res) => {
-  const { name, port } = req.body;
+router.post("/:name/setPort", (req, res) => {
+  const { name } = req.params;
+  const { port } = req.body;
   const channel = channelManager.getChannel(name);
   if (channel) {
     channel.setPort(port);
@@ -73,8 +75,9 @@ router.post("/setPort", (req, res) => {
 }
 );
 
-router.post("/setDevice", (req, res) => {
-  const { name, device } = req.body;
+router.post("/:name/setDevice", (req, res) => {
+  const { name } = req.params;
+  const { device } = req.body;
   const channel = channelManager.getChannel(name);
   if (channel) {
     channel.setDevice(device);
