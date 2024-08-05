@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const port = 4000;
+const path = require("path")
 const config = require("config");
 const DeviceManager = require("./models/DeviceManager");
 const TimerManager = require("./models/TimerManager");
