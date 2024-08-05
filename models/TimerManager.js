@@ -8,10 +8,21 @@ const removeElement = (array, element) => {
   }
 }
 class TimerManager {
+  static instance=null;
   constructor(channelManager) {
+    if(TimerManager.instance){
+      return TimerManager.instance;
+    }
+    TimerManager.instance=this;
     this.timers = [];
     this.channelManager = channelManager;
     this.localStorage = new LocalStorage('./storage/timers');
+  }
+  static getInstance(channelManager){
+    if(!TimerManager.instance){
+      TimerManager.instance=new TimerManager(channelManager);
+    }
+    return TimerManager.instance;
   }
   init(){
     this.loadTimers();

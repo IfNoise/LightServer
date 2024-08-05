@@ -2,9 +2,16 @@ const LocalStorage = require('node-localstorage').LocalStorage;
 const ModbusDevice = require('./ModbusDevice');
 
 class DeviceManager {
+  static instance = null;
   constructor() {
     this.devices = [];
     this.localStorage = new LocalStorage('./storage/devices');
+  }
+  static getInstance() {
+    if (!DeviceManager.instance) {
+      DeviceManager.instance = new DeviceManager();
+    }
+    return DeviceManager.instance;
   }
   loadDevices() {
     const devices = JSON.parse(this.localStorage.getItem('devices'));

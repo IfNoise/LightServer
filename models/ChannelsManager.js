@@ -2,12 +2,20 @@ const LocalStorage = require('node-localstorage').LocalStorage;
 const LightChannel = require('./LightChannel');
 
 class ChannelsManager {
+  static instance = null;
   constructor(deviceManager) {
     this.channels = [];
     this.localStorage = new LocalStorage('./storage/channels');
     this.deviceManager = deviceManager;
   }
 
+  static getInstance(deviceManager) {
+    if (!ChannelsManager.instance) {
+      ChannelsManager.instance = new ChannelsManager(deviceManager);
+    }
+    return ChannelsManager.instance;
+  }
+  
   loadChannels() {
     const channels = JSON.parse(this.localStorage.getItem('channels'));
     if (channels?.length>0) {

@@ -1,3 +1,5 @@
+const c = require('config');
+
 const LocalStorage = require('node-localstorage').LocalStorage;
 
 class LightChannel {
@@ -13,11 +15,66 @@ class LightChannel {
   init() {
     this.maxLevel=parseInt(this.localStorage.getItem("maxLevel"))||0;
   }
+  setDevice(deviceName){
+    try{
+      const device=this.deviceManager.getDevice(deviceName);
+      if(!device){
+        throw new Error("Device not found");       
+      }
+      if(this.device){
+        if(this.device.name==deviceName){
+          return
+        }
+      }
+      this.device=device;
+      this.localStorage.setItem("device",device.name)  
+    }
+    catch(e){
+      console.log(e.message)
+      return;
+    }
+    const device=this.deviceManager.getDevice(deviceName);
+    this.device=device;
+    this.localStorage.setItem("device",device.name)
+  }
+  setPort(port){
+    try{
+      if(Number.isNaN(port)){
+        throw new Error("Port must be a number")
+      }
+      this.port=port;
+      this.localStorage.setItem("port",port)
+    }
+    catch(e){
+      console.log(e.message)
+      return;
+    }
+
+  }
   setMaxLevel(maxLevel){
-    this.maxLevel=maxLevel*32767/100;
-    this.localStorage.setItem("maxLevel",this.maxLevel)
+    try{
+      if(Number.isNaN(maxLevel)){
+        throw new Error("Max level must be a number")
+      }
+      if(maxLevel<0||maxLevel>100){
+        throw new Error("Max level must be between 0 and 100")
+      }
+      this.maxLevel=maxLevel*32767/100;
+      this.localStorage.setItem("maxLevel",this.maxLevel)
+    }
+    catch(e){
+      console.log(e.message)
+      return;
+    }
   }
   async setPersentage(persentage){
+    try{
+      if(Number.isNaN(persentage)){
+        throw new Error("Persentage must be a number")
+      }
+      if(persentage<0||persentage>100){
+        throw new Error("Persentage must be between 0 and 100")
+      }
     const newLevel=Math.floor(this.maxLevel*persentage/100);
     if(newLevel==this.level){
       return;
@@ -26,23 +83,33 @@ class LightChannel {
     console.log("Timer",this.name,"set level",this.level)
     const res=await this.device.updatePort(this.port,this.level);
     if(res){
-      console.log("Port",this.port,"set to",this.level)
+      console.log("Port",this.port,"set to",this.level,Math.floor(this.level/32767*100),"%")
       console.log("res",res)
     }
   }
+  catch(e){
+    console.log(e.message)
+    return;
+  }
+  }
+
   json(){
     return {name:this.name,device:this.device.name,port:this.port,maxLevel:this.maxLevel};
   } 
   async getState(){
-    let state
-    if(this.device){
+    try{
+      if(this.device){
       const ports=await this.device.requestState()
-      state=ports[this.port];
-  
-    }else{
-      state=0;
+      return ports[this.port];
     }
-    return state;
+    else{
+      throw new Error("Device not set")
+    }
+    }
+    catch(e){
+      console.log(e.message)
+      return;
+    }
   }
 }
 

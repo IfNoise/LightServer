@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Card, CircularProgress, Divider, MenuItem, Select, Slide, Slider, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Card, CircularProgress, Divider, MenuItem, Select, Slide, Slider, Stack, TextField, Typography } from "@mui/material";
 import { useAddChannelMutation, useGetDevicesQuery, useGetLightChannelsQuery, useGetLightChannelStateQuery, useRemoveChannelMutation, useSetMaxLevelMutation } from "../store/lightApi";
 import { useEffect, useState } from "react";
 import PropTypes from 'prop-types';
@@ -27,15 +27,39 @@ const ChannalCard=({channel})=>{
   }
   return(
     <Card 
-    sx={{m:2,p:2}}  
+    sx={{
+      m:"4px",
+      p:"8px",
+      display:"flex",
+      flexDirection:"column",
+      width:"290px"
+    }}  
     >
-      <Typography variant="h6">{name}</Typography>
-      <Typography variant="body1">{device||""}:{port||0}</Typography>
-      <Divider/>
-
-      {state?.state&&<Typography variant="body2">Brigth:{state.state}</Typography>}
-      <Divider/>
+      <Stack direction="row" spacing={1}>
+      <Box>
+      <Typography variant="body">{name}</Typography>
+      <Typography variant="caption" component={'div'} >{device||""}:{port||0}</Typography>
+      </Box>
+      {state?.state&&<Typography variant="h6" sx={{backgroundColor:"#a6a6ff",color:"blue",borderRadius:"20%",px:"5px"}}>Brigth:{Math.floor(state.state/32767*100)}%</Typography>}
+      <Button
+        variant="contained"
+        color="error"
+        size="small"
+        sx={{
+          maxWidth: '25px', maxHeight: '25px', minWidth: '25px', minHeight: '25px',
+          borderRadius:"50%",
+          p:"0px",
+          ml:"30px"
+        }}
+        onClick={handleRemoveChannel}
+      >X</Button>
+      </Stack>
       <Slider
+      sx={{
+        width:"90%",
+        ml:"10px"
+      }}
+      size="small"
       getAriaLabel={() => 'Minimum distance'}
       valueLabelDisplay="auto"
       getAriaValueText={valuetext}
@@ -50,11 +74,7 @@ const ChannalCard=({channel})=>{
          
       }}
       />
-      <Button
-        variant="contained"
-        color="error"
-        onClick={handleRemoveChannel}
-      >Delete</Button>
+      
     </Card>
   )
 }
@@ -77,7 +97,9 @@ export default function ChannelsList() {
       <Typography variant="h4">Channels</Typography>
       {isLoading && <CircularProgress />}
       {isError && <Alert severity="error">{error.message}</Alert>}
+      <Stack direction="row" useFlexGap flexWrap={"wrap"}  spacing={1}>
       {isSuccess&& channels?.map((channel,idx)=><ChannalCard key={idx} channel={channel}/>)}
+      </Stack>
       <Divider/>
       <Typography variant="h6">Add Channel</Typography>
       <TextField

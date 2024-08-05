@@ -1,2 +1,4 @@
 node_modules
 storage
+storage/timers/timers
+storage/channels/channels
