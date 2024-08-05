@@ -4,7 +4,7 @@ import {baseUrl} from "../config/config"
 export const lightApi = createApi({
   reducerPath: "light/api",
   baseQuery: fetchBaseQuery({
-    baseUrl: baseUrl,
+    baseUrl: baseUrl+"/light/api",
     
     // prepareHeaders: (headers, { getState }) => {
     //   const token = getState().auth.token
