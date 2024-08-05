@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const port = 3000;
+const port = 4000;
 const config = require("config");
 const DeviceManager = require("./models/DeviceManager");
 const TimerManager = require("./models/TimerManager");
@@ -26,12 +26,10 @@ app.use("/light/api/devices", require("./routes/devices.route"));
 app.use("/light/api/timers", require("./routes/timers.route"));
 app.use("/light/api/lightChannels", require("./routes/lightChannels.route"));
 
-if (config.has("server.port")) {
-  port = config.get("server.port");
-}
+
 
 if (process.env.NODE_ENV === 'production') {
-  app.use('/', express.static(path.join(__dirname, 'client-vite', 'dist')))
+  app.use('/light', express.static(path.join(__dirname, 'client-vite', 'dist')))
 
   app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client-vite', 'dist', 'index.html'))
