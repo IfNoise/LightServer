@@ -1,1 +1,1 @@
-export const baseUrl = "http://ddweed.org/";
+export const baseUrl = "http://ddweed.org";
