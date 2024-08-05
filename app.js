@@ -30,9 +30,9 @@ app.use("/light/api/lightChannels", require("./routes/lightChannels.route"));
 
 
 if (process.env.NODE_ENV === 'production') {
-  app.use('/light', express.static(path.join(__dirname, 'client-vite', 'dist')))
+  app.use('/light/', express.static(path.join(__dirname, 'client-vite', 'dist')))
 
-  app.get('*', (req, res) => {
+  app.get('/light/*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client-vite', 'dist', 'index.html'))
   })
 }
