@@ -23,17 +23,18 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json({ extended: true }));
 
-app.use("/api/devices", require("./routes/devices.route"));
-app.use("/api/timers", require("./routes/timers.route"));
-app.use("/api/lightChannels", require("./routes/lightChannels.route"));
+app.use("/light/api/devices", require("./routes/devices.route"));
+app.use("/light/api/timers", require("./routes/timers.route"));
+app.use("/light/api/lightChannels", require("./routes/lightChannels.route"));
 
 
 
-  app.use('/', express.static(path.join(__dirname, 'client', 'dist')))
+  app.use('/light/', express.static(path.join(__dirname, 'client', 'dist')))
 
-  app.get('*', (req, res) => {
+  app.get('/light/*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'))
   })
+
 
 
 app.listen(port, () => {
