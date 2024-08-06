@@ -31,7 +31,7 @@ if (process.env.NODE_ENV === 'production') {
   router.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'))
   })
-  app.use(router)
+  app.use("/light/",router)
 }
 
 app.use("/light/api/devices", require("./routes/devices.route"));
