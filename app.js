@@ -1,4 +1,6 @@
 const express = require("express");
+const {Router}= require('express');
+const router=Router();
 const cors = require("cors");
 const port = 4000;
 const path = require("path")
@@ -26,9 +28,10 @@ app.use(express.json({ extended: true }));
 if (process.env.NODE_ENV === 'production') {
   app.use('/light/', express.static(path.join(__dirname, 'client', 'dist')))
 
-  app.get('/light', (req, res) => {
+  router.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'))
   })
+  app.use(router)
 }
 
 app.use("/light/api/devices", require("./routes/devices.route"));
