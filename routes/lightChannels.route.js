@@ -33,7 +33,8 @@ router.get("/:name/state", async (req, res) => {
 });
 
 router.post("/add", (req, res) => {
-  const { name, device, port } = req.body;
+  const { name, device:deviceName, port } = req.body;
+  const device=this.deviceManager.getDevice(deviceName);
   channelManager.addChannel({name,device,port});
   res.json({ status: "ok" });
 });
@@ -77,8 +78,9 @@ router.post("/:name/setPort", (req, res) => {
 
 router.post("/:name/setDevice", (req, res) => {
   const { name } = req.params;
-  const { device } = req.body;
+  const { device:deviceName } = req.body;
   const channel = channelManager.getChannel(name);
+  const device=this.deviceManager.getDevice(deviceName);
   if (channel) {
     channel.setDevice(device);
     res.json({ status: "ok" });

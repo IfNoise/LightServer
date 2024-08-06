@@ -15,27 +15,19 @@ class LightChannel {
   init() {
     this.maxLevel=parseInt(this.localStorage.getItem("maxLevel"))||0;
   }
-  setDevice(deviceName){
-    try{
-      const device=this.deviceManager.getDevice(deviceName);
-      if(!device){
-        throw new Error("Device not found");       
-      }
+  setDevice(device){
+    try{ 
       if(this.device){
-        if(this.device.name==deviceName){
+        if(this.device.name==device.name){
           return
         }
       }
       this.device=device;
-      this.localStorage.setItem("device",device.name)  
     }
     catch(e){
       console.log(e.message)
       return;
     }
-    const device=this.deviceManager.getDevice(deviceName);
-    this.device=device;
-    this.localStorage.setItem("device",device.name)
   }
   setPort(port){
     try{
