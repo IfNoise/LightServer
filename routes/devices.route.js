@@ -27,13 +27,13 @@ router.get("/:name/state", async (req, res) => {
     res.json({ status: "error" });
   }
 });
-router.post("/api/devices/add", (req, res) => {
+router.post("/add", (req, res) => {
   const { name, address, port } = req.body;
   deviceManager.addDevice(name, { host: address, port });
   res.json({ status: "ok" });
 });
 
-router.post("/api/devices/remove", (req, res) => {
+router.post("/remove", (req, res) => {
   const { name } = req.body;
   const device = deviceManager.getDevice(name);
   if (device) {
