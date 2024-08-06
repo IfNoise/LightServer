@@ -17,5 +17,8 @@ export const Router = createBrowserRouter(
       <Route path="/settings" element={<Settings/>} />
     </Route>
     </>
-  )
+  ),
+  {
+    basename: "/light",
+  }
 );

@@ -25,6 +25,12 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json({ extended: true }));
 
+
+
+app.use("/light/api/devices", require("./routes/devices.route"));
+app.use("/light/api/timers", require("./routes/timers.route"));
+app.use("/light/api/lightChannels", require("./routes/lightChannels.route"));
+
 if (process.env.NODE_ENV === 'production') {
   app.use('/light/', express.static(path.join(__dirname, 'client', 'dist')))
 
@@ -33,11 +39,6 @@ if (process.env.NODE_ENV === 'production') {
   })
   app.use("/light/",router)
 }
-
-app.use("/light/api/devices", require("./routes/devices.route"));
-app.use("/light/api/timers", require("./routes/timers.route"));
-app.use("/light/api/lightChannels", require("./routes/lightChannels.route"));
-
 app.listen(port, () => {
   console.log(`Server app listening at http://localhost:${port}`);
 })
