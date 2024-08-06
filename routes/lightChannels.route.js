@@ -34,7 +34,7 @@ router.get("/:name/state", async (req, res) => {
 
 router.post("/add", (req, res) => {
   const { name, device:deviceName, port } = req.body;
-  const device=this.deviceManager.getDevice(deviceName);
+  const device=deviceManager.getDevice(deviceName);
   if (!device) {
     res.json({ status: "error" });
     return;

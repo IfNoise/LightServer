@@ -11,7 +11,7 @@ const ChannelsManager = require("./models/ChannelsManager");
 const bodyParser = require("body-parser");
 //=========================================================
 const app = express();
-const deviceManager = new DeviceManager();
+const deviceManager = DeviceManager.getInstance();
 deviceManager.init();
 
 let channelManager = ChannelsManager.getInstance(deviceManager);
