@@ -30,9 +30,7 @@ class DeviceManager {
   }
   init() {
     this.loadDevices();
-    this.devices.forEach((device) => {
-      device.init();
-    });
+
   }
   addDevice(name,options) {
     const device = new ModbusDevice(name,options.host,options.port);

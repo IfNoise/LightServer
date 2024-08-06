@@ -83,8 +83,7 @@ class TimerManager {
   unsubscribe(timer, channels) {
     const tmr=this.timers.find(t => t.name === timer);
     channels.forEach(channel => {
-      let ch=this.channelManager.getChannel(channel);
-      tmr.unsubscribe(ch);
+      tmr.unsubscribe(channel);
     });
     this.saveTimers();
   }
