@@ -21,8 +21,7 @@ class ChannelsManager {
     if (channels?.length>0) {
       this.channels = [];
       channels.forEach((channel) => {
-        const dev=this.deviceManager.getDevice(channel.device);
-        this.addChannel({name:channel.name,device:dev,port:channel.port});
+        this.addChannel({name:channel.name,device:channel.device,port:channel.port});
       });
     }
   }
@@ -40,7 +39,8 @@ class ChannelsManager {
     }
   }
   addChannel(channel) {
-    const newChannel = new LightChannel(channel.name, channel.device, channel.port);
+    const device=this.deviceManager.getDevice(channel.device);
+    const newChannel = new LightChannel(channel.name,device, channel.port);
     newChannel.init()
     this.channels.push(newChannel);
     this.saveChannels();
