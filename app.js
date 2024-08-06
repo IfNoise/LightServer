@@ -31,13 +31,13 @@ app.use("/api/devices", require("./routes/devices.route"));
 app.use("/api/timers", require("./routes/timers.route"));
 app.use("/api/lightChannels", require("./routes/lightChannels.route"));
 
-if (process.env.NODE_ENV === 'production') {
+
   app.use('/', express.static(path.join(__dirname, 'client', 'dist')))
 
   app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'))
   })
-}
+
 app.listen(port, () => {
   console.log(`Server app listening at http://localhost:${port}`);
 })
