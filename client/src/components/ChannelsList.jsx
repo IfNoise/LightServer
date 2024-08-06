@@ -7,6 +7,12 @@ function valuetext(value) {
   return `${value}%`;
 }
 
+const includes=(arr1,arr2)=>{
+  return arr2.every((item)=>arr1.includes(item));
+}
+
+
+
 
 const ChannalCard=({channel})=>{
   const {name,device,port,maxLevel}=channel;
@@ -83,15 +89,23 @@ ChannalCard.propTypes={
 } 
 
 
-export default function ChannelsList() {
-  const {data:channels,isLoading,isSuccess,isError,error}=useGetLightChannelsQuery({
-    
+export default function ChannelsList({channelNames}) {
+  const {data,isLoading,isSuccess,isError,error}=useGetLightChannelsQuery({   
   })
+  const [channels,setChannels]=useState([]);
   const {data:devices}=useGetDevicesQuery();
   const [newChannel,setNewChannel]=useState({name:"",device:"",port:""});
   const [addChannel]=useAddChannelMutation();
+  useEffect(()=>{
+    if(data?.length>0&&channelNames?.length>0){
+      const ch=data.filter((channel)=>channelNames.includes(channel.name));
+      setChannels([...ch]);
 
-
+    }else{
+      setChannels([...data]);
+    }
+  }
+  ,[data,channelNames])
   return(
     <Box>
       <Typography variant="h4">Channels</Typography>
@@ -133,5 +147,8 @@ export default function ChannelsList() {
     </Box>
   )
 
+}
+ChannelsList.propTypes={
+  channelNames:PropTypes.array
 }
 

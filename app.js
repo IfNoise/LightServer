@@ -30,13 +30,8 @@ app.use(express.json({ extended: true }));
 app.use("/api/devices", require("./routes/devices.route"));
 app.use("/api/timers", require("./routes/timers.route"));
 app.use("/api/lightChannels", require("./routes/lightChannels.route"));
-
-
-  app.use('/', express.static(path.join(__dirname, 'client', 'dist')))
-
-
 app.listen(port, () => {
-  console.log(`Server app listening at http://localhost:${port}`);
+  console.log(`Server app listening at ${port} port`);
 })
 const gracefulShutdown = (signal) => {
   console.log(`Received ${signal}. Shutting down gracefully...`);

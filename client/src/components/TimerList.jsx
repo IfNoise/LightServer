@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { useEffect, useState } from "react";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import PropTypes from 'prop-types';
+import ChannelsList from "./ChannelsList";
 
 const includes=(arr1,arr2)=>{
   return arr2.every((item)=>arr1.includes(item));
@@ -193,7 +194,7 @@ const TimerCard=({timer})=>{
       {sunriseTime&&<Typography>Sunrise{dayjs(minutesToDate(sunriseTime)).format("HH:mm").toString()||""}</Typography>}
       {sunsetTime&&<Typography>Sunset{dayjs(minutesToDate(sunsetTime)).format("HH:mm").toString()||""}</Typography>}
       {state&&<Typography>State:{state||""}</Typography>}
-
+      {channels?.length>0&&<ChannelsList channelNames={channels}/>} 
     
     <CardActions>
       <Button
