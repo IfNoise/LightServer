@@ -41,9 +41,8 @@ router.post("/add", (req, res) => {
 
 router.post("/remove", (req, res) => {
   const { name } = req.body;
-  const channel = channelManager.getChannel(name);
-  if (channel) {
-    channelManager.removeChannel(channel);
+  if (name) {
+    channelManager.removeChannel(name);
     res.json({ status: "ok" });
   } else {
     res.json({ status: "error" });
