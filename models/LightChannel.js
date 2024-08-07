@@ -93,7 +93,7 @@ class LightChannel {
   }
 
   json(){
-    return {name:this.name,device:this.device?.name||"",port:this.port,maxLevel:this.maxLevel};
+    return {name:this.name,device:this.device?.name||"",port:this.port,maxLevel:this.maxLevel,manual:this.manual};
   } 
   async getState(){
     try{
