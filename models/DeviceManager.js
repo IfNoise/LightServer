@@ -21,6 +21,7 @@ class DeviceManager {
       devices.forEach((device) => {
         this.addDevice(device.name,device.options);
       })}
+      console.log("Loaded Devices",this.devices)
   }
   saveDevices() {
     const tempDevices=this.devices.map((device)=>{
