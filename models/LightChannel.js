@@ -9,6 +9,7 @@ class LightChannel {
     this.port = port;
     this.maxLevel=0; 
     this.level=0;
+    this.manual=true;
     this.nightMode=true;
     this.localStorage = new LocalStorage('./storage/channels/'+name);
   }
@@ -51,7 +52,13 @@ class LightChannel {
       if(maxLevel<0||maxLevel>100){
         throw new Error("Max level must be between 0 and 100")
       }
+      if(this.manual){
+        this.maxLevel=maxLevel*32767/100;
+        this.setPersentage(100)
+        }
+      else{
       this.maxLevel=maxLevel*32767/100;
+      }
       this.localStorage.setItem("maxLevel",this.maxLevel)
     }
     catch(e){

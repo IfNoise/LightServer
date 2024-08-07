@@ -23,15 +23,12 @@ router.get("/:name", (req, res) => {
 
 router.post("/add", (req, res) => {
   const { name, steps, stepTime, sunriseTime, sunsetTime } = req.body;
-  timerManager.addTimer(name, steps, stepTime, sunriseTime, sunsetTime);
-  res.json({ status: "ok" });
+  res.json(timerManager.addTimer(name, steps, stepTime, sunriseTime, sunsetTime));
 });
 
 router.post("/remove", (req, res) => {
   const { name } = req.body;
-  timerManager.removeTimer(name);
-
-  res.json({ status: "ok" });
+  res.json(timerManager.removeTimer(name));
 });
 
 router.post("/:name/setSteps", (req, res) => {
@@ -89,15 +86,13 @@ router.post("/:name/setStepTime", (req, res) => {
 router.post("/:name/subscribe", (req, res) => {
   const { name } = req.params;
   const channels = [...req.body?.channels];
-  timerManager.subscribe(name, channels);
-  res.json({ status: "ok" });
+  res.json(timerManager.subscribe(name, channels));
 });
 
 router.post("/:name/unsubscribe", (req, res) => {
   const { name } = req.params;
   const channels = [...req.body?.channels];
-  timerManager.unsubscribe(name, channels);
-  res.json({ status: "ok" });
+  res.json(timerManager.unsubscribe(name, channels));
 });
 
 router.post("/:name/start", (req, res) => {

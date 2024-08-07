@@ -1,4 +1,5 @@
 const LocalStorage = require('node-localstorage').LocalStorage;
+const c = require('config');
 const LightChannel = require('./LightChannel');
 
 class ChannelsManager {
@@ -39,20 +40,53 @@ class ChannelsManager {
     }
   }
   addChannel(channel) {
-    const device=this.deviceManager.getDevice(channel.device);
-    const newChannel = new LightChannel(channel.name,device, channel.port);
-    newChannel.init()
-    this.channels.push(newChannel);
-    this.saveChannels();
+    try {
+      const {name,device:deviceName,port} = channel;
+      if(this.channels.find((c)=>c.name===name)){
+        throw new Error('Channel already exists');
+      }
+      if(deviceName===undefined||deviceName===''||port===undefined||port===''){
+        throw new Error('Invalid parameters');
+      }
+      if(!this.deviceManager.getDevice(deviceName)){
+        throw new Error('Device not found');
+      }
+      const device=this.deviceManager.getDevice(deviceName);
+      const newChannel = new LightChannel(name,device, port);
+      newChannel.init()
+      this.channels.push(newChannel);
+      this.saveChannels();
+      return {status:'ok'};
+    }catch(e){
+      console.log(e);
+      return {status:'error',message:e.message};
+    }
   }
 
   removeChannel(name) {
-    this.channels = this.channels.filter((c) => c.name !== name);
-    this.saveChannels();
+    try {
+      if(!this.channels.find((c)=>c.name===name)){
+        throw new Error('Channel not found');
+      }
+      this.channels = this.channels.filter((c) => c.name !== name);
+      this.saveChannels();
+      return {status:'ok'};
+    }catch(e){
+      console.log(e);
+      return {status:'error',message:e.message};
+    }
   }
 
   getChannels() {
-    return this.channels;
+    try {
+      if(this.channels.length===0){
+        throw new Error('No channels found');
+      }
+      return this.channels
+    }catch(e){
+      console.log(e);
+      return {status:'error',message:e.message};
+    }
   }
   getChannelsJSON() {
     return this.channels.map((channel) => {
