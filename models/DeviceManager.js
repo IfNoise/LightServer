@@ -15,13 +15,11 @@ class DeviceManager {
   }
   loadDevices() {
     const devices = JSON.parse(this.localStorage.getItem('devices'));
-    console.log("Saved Devices",devices)
     if (devices?.length>0) {
       this.devices=[];
       devices.forEach((device) => {
         this.addDevice(device.name,device.options);
       })}
-      console.log("Loaded Devices",this.devices)
   }
   saveDevices() {
     const tempDevices=this.devices.map((device)=>{
