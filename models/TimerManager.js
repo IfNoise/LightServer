@@ -70,13 +70,6 @@ class TimerManager {
       ) {
         throw new Error("Invalid parameters");
       }
- 
-      if (steps < 1 || stepTime < 1 || sunriseTime < 0 || sunsetTime < 0) {
-        throw new Error("Invalid parameters");
-      }
-      if (sunriseTime >= sunsetTime) {
-        throw new Error("Invalid parameters");
-      }
       const timer = new Timer(name);
       timer.setSteps(steps);
       timer.setStepTime(stepTime);
