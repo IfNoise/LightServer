@@ -49,13 +49,11 @@ class LightChannel {
       if(Number.isNaN(maxLevel)){
         throw new Error("Max level must be a number")
       }
+      this.maxLevel=maxLevel;
       if(this.manual){
-        this.maxLevel=maxLevel*32767/100;
         this.setPersentage(100)
         }
-      else{
-      this.maxLevel=maxLevel*32767/100;
-      }
+
       this.localStorage.setItem("maxLevel",this.maxLevel)
     }
     catch(e){
