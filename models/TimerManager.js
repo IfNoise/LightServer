@@ -70,14 +70,7 @@ class TimerManager {
       ) {
         throw new Error("Invalid parameters");
       }
-      if (
-        Number.isNaN(steps) ||
-        Number.isNaN(stepTime) ||
-        Number.isNaN(sunriseTime) ||
-        Number.isNaN(sunsetTime)
-      ) {
-        throw new Error("Invalid parameters");
-      }
+ 
       if (steps < 1 || stepTime < 1 || sunriseTime < 0 || sunsetTime < 0) {
         throw new Error("Invalid parameters");
       }
