@@ -121,13 +121,18 @@ class Timer {
         //if time is after sunrise
         const step = Math.floor((time - timer.sunriseTime) / timer.stepTime); //calculate step
         timer.channels.forEach((ch) => {
-          ch.setPersentage((step / (steps - 1)) * 100); //set persentage
+          const persent=(step / (steps-1)) * 100
+          if(step==0||persent<10)ch.setPersentage(10);
+          else
+          ch.setPersentage(persent); //set persentage
         });
       } else if (time > timer.sunsetTime - steps * timer.stepTime) {
         //if time is after sunset
         const step = Math.floor((timer.sunsetTime - time) / timer.stepTime); //calculate step
         timer.channels.forEach((ch) => {
-          ch.setPersentage((step / (steps - 1)) * 100); //set persentage
+          const persent=(step / (steps-1)) * 100
+          if(step==0||persent<10)ch.setPersentage(10);
+          else ch.setPersentage(persent); //set persentage
         });
       }else{
         timer.channels.forEach((ch) => {

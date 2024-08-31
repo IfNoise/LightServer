@@ -10,7 +10,7 @@ class LightChannel {
     this.maxLevel=0; 
     this.level=0;
     this.manual=true;
-    this.nightMode=true;
+    //this.nightMode=true;
     this.localStorage = new LocalStorage('./storage/channels/'+name);
   }
   init() {
