@@ -93,6 +93,12 @@ class TimerManager {
       if (!this.timers.find((t) => t.name === timer)) {
         throw new Error("Timer not found");
       }
+      const tmr = this.timers.find((t) => t.name === timer);
+      tmr.channels.forEach((channel) => {
+        channel.manual = true;
+      }
+      );
+      
       this.timers = this.timers.filter((t) => t.name !== timer);
       this.saveTimers();
       return { status: "ok" };
