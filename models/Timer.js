@@ -79,7 +79,7 @@ class Timer {
   calcState(timer) {
     const now = new Date(); //get current time
     const time = now.getHours() * 60 + now.getMinutes(); //convert time to minutes
-    const steps = timer.steps + 1;
+    const steps = timer.steps;
     if (timer.sunriseTime < timer.sunsetTime) {
       //if sunrise is before sunset
 
@@ -94,19 +94,19 @@ class Timer {
         const step = Math.floor((time - timer.sunriseTime) / timer.stepTime); //calculate step
         console.log("Time", now, "CalcStep", step);
         timer.channels.forEach((ch) => {
-          ch.setPersentage((step / (steps-1)) * 100); //set persentage
+          ch.setPersentage((step + 1 / steps) * 100); //set persentage
         });
       } else if (time > timer.sunsetTime - steps * timer.stepTime) {
         //if time is after sunset
         const step = Math.floor((timer.sunsetTime - time) / timer.stepTime); //calculate step
         console.log("Time", now, "CalcStep", step);
         timer.channels.forEach((ch) => {
-          ch.setPersentage((step / (steps - 1)) * 100); //set persentage
+          ch.setPersentage((step + 1 / steps) * 100); //set persentage
         });
-      }else{
+      } else {
         timer.channels.forEach((ch) => {
           ch.setPersentage(100);
-          ch.nightMode ? (ch.nightMode =false) : (ch.nightMode = true);
+          ch.nightMode ? (ch.nightMode = false) : (ch.nightMode = true);
         });
       }
     } else {
@@ -121,23 +121,22 @@ class Timer {
         //if time is after sunrise
         const step = Math.floor((time - timer.sunriseTime) / timer.stepTime); //calculate step
         timer.channels.forEach((ch) => {
-          const persent=(step / (steps-1)) * 100
-          if(step==0||persent<10)ch.setPersentage(10);
-          else
-          ch.setPersentage(persent); //set persentage
+          const persent = (step + 1 / steps) * 100;
+          if (step == 0 && persent < 10) ch.setPersentage(10);
+          else ch.setPersentage(persent); //set persentage
         });
       } else if (time > timer.sunsetTime - steps * timer.stepTime) {
         //if time is after sunset
         const step = Math.floor((timer.sunsetTime - time) / timer.stepTime); //calculate step
         timer.channels.forEach((ch) => {
-          const persent=(step / (steps-1)) * 100
-          if(step==0||persent<10)ch.setPersentage(10);
+          const persent = (step + 1 / steps) * 100;
+          if (step == 0 && persent < 10) ch.setPersentage(10);
           else ch.setPersentage(persent); //set persentage
         });
-      }else{
+      } else {
         timer.channels.forEach((ch) => {
           ch.setPersentage(100);
-          ch.nightMode ? (ch.nightMode =false) : (ch.nightMode = true);
+          ch.nightMode ? (ch.nightMode = false) : (ch.nightMode = true);
         });
       }
     }
