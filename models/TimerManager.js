@@ -43,7 +43,7 @@ class TimerManager {
         // Подписываемся на события таймера
         newTimer.on("stateUpdate", ({ brightness, channels }) => {
           channels.forEach((channel) => {
-            channel.setBrightness(brightness);
+            channel.setPersentage(brightness);
           });
         });
 
