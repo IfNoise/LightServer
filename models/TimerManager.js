@@ -25,9 +25,11 @@ class TimerManager {
     }
     return TimerManager.instance;
   }
+
   init() {
     this.loadTimers();
   }
+
   loadTimers() {
     try {
       const timers = JSON.parse(this.localStorage.getItem("timers")) ?? [];

@@ -222,6 +222,18 @@ class Timer extends EventEmitter {
     });
   }
 
+  json() {
+    return {
+      name: this.name,
+      state: this.#state,
+      steps: this.steps,
+      stepTime: this.stepTime,
+      sunriseTime: this.sunriseTime,
+      sunsetTime: this.sunsetTime,
+      channels: Array.from(this.channels),
+    };
+  }
+
   start() {
     if (this.#state === TIMER_STATES.STARTED) return;
 
