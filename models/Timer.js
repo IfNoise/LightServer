@@ -223,14 +223,15 @@ class Timer extends EventEmitter {
   }
 
   json() {
+    const channels = this.getChannels();
     return {
       name: this.name,
-      state: this.#state,
+      state: this.state,
       steps: this.steps,
       stepTime: this.stepTime,
       sunriseTime: this.sunriseTime,
       sunsetTime: this.sunsetTime,
-      channels: Array.from(this.channels),
+      channels,
     };
   }
 
