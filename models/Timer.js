@@ -115,6 +115,11 @@ class Timer extends EventEmitter {
       ? currentTime < this.sunriseTime || currentTime > this.sunsetTime
       : currentTime > this.sunsetTime && currentTime < this.sunriseTime;
   }
+  getChannels() {
+    return this.channels.map((ch) => {
+      return ch.name;
+    });
+  }
 
   #isTransitionTime(currentTime, timePoint, isRising) {
     const transitionPeriod = this.steps * this.stepTime;
