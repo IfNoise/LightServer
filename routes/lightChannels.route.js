@@ -22,7 +22,7 @@ router.get("/:name", (req, res) => {
 
 router.get("/state", async (req, res) => {
   const state = await channelManager.getChannelsState();
-  res.json({ state });
+  res.json(state);
 });
 
 router.get("/:name/state", async (req, res) => {
