@@ -116,7 +116,7 @@ class Timer extends EventEmitter {
       : currentTime > this.sunsetTime && currentTime < this.sunriseTime;
   }
   getChannels() {
-    return Array.from(this.channels).map((channel) => channel.name); // Возвращаем массив имен каналов
+    return Array.from(this.channels).map((channel) => channel.name) || []; // Возвращаем массив имен каналов
   }
 
   #isTransitionTime(currentTime, timePoint, isRising) {
