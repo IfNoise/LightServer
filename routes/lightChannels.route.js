@@ -10,16 +10,6 @@ router.get("/", (req, res) => {
   res.json(channelManager.getChannelsJSON());
 });
 
-router.get("/:name", (req, res) => {
-  const { name } = req.params;
-  const channel = channelManager.getChannel(name);
-  if (channel) {
-    res.json(channel.json());
-  } else {
-    res.json({ status: "error" });
-  }
-});
-
 router.get("/state", async (req, res) => {
   if (channelManager.channels.length === 0) {
     res.json({ status: "error", message: "No channels found" });
@@ -28,6 +18,16 @@ router.get("/state", async (req, res) => {
   const state = await channelManager.getChannelsJSON();
   console.log(state);
   res.json(state);
+});
+
+router.get("/:name", (req, res) => {
+  const { name } = req.params;
+  const channel = channelManager.getChannel(name);
+  if (channel) {
+    res.json(channel.json());
+  } else {
+    res.json({ status: "error" });
+  }
 });
 
 router.get("/:name/state", async (req, res) => {
