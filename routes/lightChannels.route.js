@@ -26,6 +26,7 @@ router.get("/state", async (req, res) => {
     return;
   }
   const state = await channelManager.getChannelsJSON();
+  console.log(state);
   res.json(state);
 });
 
