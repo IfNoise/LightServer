@@ -98,12 +98,15 @@ class ChannelsManager {
     }
   }
   getChannelsJSON() {
+    if (this.channels.length === 0) {
+      return { status: "error", message: "No channels found" };
+    }
     return this.channels.map((channel) => {
       return channel.json();
     });
   }
   getChannel(name) {
-    return this.channels.find((c) => c.name === name);
+    return this.channels.find((c) => c.name === name) || null;
   }
 
   async getChannelState(name) {
