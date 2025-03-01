@@ -1,15 +1,14 @@
-const {Router}= require('express');
+const { Router } = require("express");
 const router = Router();
-const DeviceManager = require('../models/DeviceManager');
-const ChannelsManager = require('../models/ChannelsManager');
+const DeviceManager = require("../models/DeviceManager");
+const ChannelsManager = require("../models/ChannelsManager");
 
 const deviceManager = DeviceManager.getInstance();
 const channelManager = ChannelsManager.getInstance(deviceManager);
 
 router.get("/", (req, res) => {
   res.json(channelManager.getChannelsJSON());
-}
-);
+});
 
 router.get("/:name", (req, res) => {
   const { name } = req.params;
@@ -21,12 +20,17 @@ router.get("/:name", (req, res) => {
   }
 });
 
+router.get("/state", async (req, res) => {
+  const state = await channelManager.getChannelsState();
+  res.json({ state });
+});
+
 router.get("/:name/state", async (req, res) => {
   const { name } = req.params;
   const channel = channelManager.getChannel(name);
   if (channel) {
     const state = await channel.getState();
-    res.json({state});
+    res.json({ state });
   } else {
     res.json({ status: "error" });
   }
@@ -35,7 +39,7 @@ router.get("/:name/state", async (req, res) => {
 router.post("/add", (req, res) => {
   const { name, device, port } = req.body;
 
-  channelManager.addChannel({name,device,port});
+  channelManager.addChannel({ name, device, port });
   res.json({ status: "ok" });
 });
 
@@ -59,8 +63,7 @@ router.post("/:name/setMaxLevel", (req, res) => {
   } else {
     res.json({ status: "error" });
   }
-}
-);
+});
 
 router.post("/:name/setPort", (req, res) => {
   const { name } = req.params;
@@ -72,24 +75,19 @@ router.post("/:name/setPort", (req, res) => {
   } else {
     res.json({ status: "error" });
   }
-}
-);
+});
 
 router.post("/:name/setDevice", (req, res) => {
   const { name } = req.params;
-  const { device:deviceName } = req.body;
+  const { device: deviceName } = req.body;
   const channel = channelManager.getChannel(name);
-  const device=this.deviceManager.getDevice(deviceName);
+  const device = this.deviceManager.getDevice(deviceName);
   if (channel) {
     channel.setDevice(device);
     res.json({ status: "ok" });
   } else {
     res.json({ status: "error" });
   }
-}
-);
+});
 
 module.exports = router;
-  
-
-

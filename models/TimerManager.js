@@ -29,24 +29,53 @@ class TimerManager {
     this.loadTimers();
   }
   loadTimers() {
-    const timers = JSON.parse(this.localStorage.getItem("timers")) ?? [];
-    this.timers = timers.map((timer) => {
-      const newTimer = new Timer(timer.name);
-      newTimer.setSteps(timer.steps);
-      newTimer.setStepTime(timer.stepTime);
-      newTimer.setSunriseTime(timer.sunriseTime);
-      newTimer.setSunsetTime(timer.sunsetTime);
-      newTimer.state = timer.state;
-      newTimer.init();
-      return newTimer;
-    });
-    timers.forEach((timer, i) => {
-      this.subscribe(timer.name, timer.channels);
-    });
+    try {
+      const timers = JSON.parse(this.localStorage.getItem("timers")) ?? [];
+      this.timers = timers.map((timer) => {
+        const newTimer = new Timer(timer.name);
+        newTimer.setSteps(timer.steps);
+        newTimer.setStepTime(timer.stepTime);
+        newTimer.setSunriseTime(timer.sunriseTime);
+        newTimer.setSunsetTime(timer.sunsetTime);
+
+        // Подписываемся на события таймера
+        newTimer.on("stateUpdate", ({ brightness, channels }) => {
+          channels.forEach((channel) => {
+            channel.setBrightness(brightness);
+          });
+        });
+
+        newTimer.on("error", (error) => {
+          console.error(`Timer ${timer.name} error:`, error);
+        });
+
+        if (timer.state === TIMER_STATES.STARTED) {
+          newTimer.start();
+        }
+        return newTimer;
+      });
+
+      // Подписываем каналы после создания всех таймеров
+      timers.forEach((timerData) => {
+        if (timerData.channels && timerData.channels.length > 0) {
+          this.subscribe(timerData.name, timerData.channels);
+        }
+      });
+    } catch (e) {
+      console.error("Error loading timers:", e);
+    }
   }
 
   saveTimers() {
-    const output = this.timers.map((timer) => timer.json());
+    const output = this.timers.map((timer) => ({
+      name: timer.name,
+      steps: timer.steps,
+      stepTime: timer.stepTime,
+      sunriseTime: timer.sunriseTime,
+      sunsetTime: timer.sunsetTime,
+      state: timer.state,
+      channels: Array.from(timer.channels).map((ch) => ch.name),
+    }));
     this.localStorage.setItem("timers", JSON.stringify(output));
   }
 
@@ -85,25 +114,22 @@ class TimerManager {
     }
   }
 
-  removeTimer(timer) {
+  removeTimer(timerName) {
     try {
-      if (timer === undefined || timer === "") {
-        throw new Error("Invalid parameters");
-      }
-      if (!this.timers.find((t) => t.name === timer)) {
-        throw new Error("Timer not found");
-      }
-      const tmr = this.timers.find((t) => t.name === timer);
-      tmr.channels.forEach((channel) => {
+      const timer = this.timers.find((t) => t.name === timerName);
+      if (!timer) throw new Error("Timer not found");
+
+      // Освобождаем все каналы
+      Array.from(timer.channels).forEach((channel) => {
         channel.manual = true;
-      }
-      );
-      
-      this.timers = this.timers.filter((t) => t.name !== timer);
+      });
+
+      timer.stop();
+      this.timers = this.timers.filter((t) => t.name !== timerName);
       this.saveTimers();
       return { status: "ok" };
     } catch (e) {
-      console.log(e.message);
+      console.error(e);
       return { status: "error", message: e.message };
     }
   }
@@ -113,46 +139,52 @@ class TimerManager {
   getTimers() {
     return this.timers.map((t) => t.json());
   }
-  subscribe(timer, channels) {
+  subscribe(timerName, channelNames) {
     try {
-      const tmr = this.timers.find((t) => t.name === timer);
-      channels.forEach((channel) => {
-        let ch = this.channelManager.getChannel(channel);
-        if (ch === undefined) {
-          throw new Error("Channel not found");
+      const timer = this.timers.find((t) => t.name === timerName);
+      if (!timer) throw new Error("Timer not found");
+
+      channelNames.forEach((channelName) => {
+        const channel = this.channelManager.getChannel(channelName);
+        if (!channel) {
+          throw new Error(`Channel ${channelName} not found`);
         }
-        if (!ch.manual) {
-          throw new Error("Channel is subscribed to another timer");
+        if (!channel.manual) {
+          throw new Error(`Channel ${channelName} is already subscribed`);
         }
-        ch.manual = false;
-        tmr.subscribe(ch);
+        channel.manual = false;
+        timer.addChannel(channel);
       });
+
       this.saveTimers();
       return { status: "ok" };
     } catch (e) {
-      console.log(e.message);
+      console.error(e);
       return { status: "error", message: e.message };
     }
   }
 
-  unsubscribe(timer, channels) {
+  unsubscribe(timerName, channelNames) {
     try {
-      const tmr = this.timers.find((t) => t.name === timer);
-      channels.forEach((channel) => {
-        let ch = this.channelManager.getChannel(channel);
-        if (ch === undefined) {
-          throw new Error("Channel not found");
+      const timer = this.timers.find((t) => t.name === timerName);
+      if (!timer) throw new Error("Timer not found");
+
+      channelNames.forEach((channelName) => {
+        const channel = this.channelManager.getChannel(channelName);
+        if (!channel) {
+          throw new Error(`Channel ${channelName} not found`);
         }
-        if (ch.manual) {
-          throw new Error("Channel is not subscribed to timer");
+        if (channel.manual) {
+          throw new Error(`Channel ${channelName} is not subscribed`);
         }
-        ch.manual = true;
-        tmr.unsubscribe(ch);
+        channel.manual = true;
+        timer.removeChannel(channel);
       });
+
       this.saveTimers();
       return { status: "ok" };
     } catch (e) {
-      console.log(e.message);
+      console.error(e);
       return { status: "error", message: e.message };
     }
   }
