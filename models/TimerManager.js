@@ -1,5 +1,5 @@
-const c = require("config");
-const Timer = require("./Timer");
+const { Timer } = require("./Timer");
+const { TIMER_STATES } = require("./Timer");
 const LocalStorage = require("node-localstorage").LocalStorage;
 
 const removeElement = (array, element) => {

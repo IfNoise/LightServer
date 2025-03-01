@@ -272,4 +272,4 @@ class Timer extends EventEmitter {
   }
 }
 
-module.exports = Timer;
+module.exports = { Timer, TIMER_STATES, DAY_PERIODS, CONSTANTS };
