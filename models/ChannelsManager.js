@@ -119,7 +119,8 @@ class ChannelsManager {
   async getChannelsState() {
     const state = await Promise.all(
       this.channels.map(async (channel) => {
-        return await channel.getState();
+        const state = await channel.getState();
+        return { name: channel.name, state };
       })
     );
     return state;
