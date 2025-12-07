@@ -184,7 +184,7 @@ class Timer extends EventEmitter {
   #calculateBrightness(currentTime, period) {
     switch (period) {
       case DAY_PERIODS.NIGHT:
-        return CONSTANTS.MIN_PERCENTAGE;
+        return 0;
 
       case DAY_PERIODS.DAY:
         return CONSTANTS.MAX_PERCENTAGE;
