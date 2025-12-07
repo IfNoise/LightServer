@@ -4,16 +4,16 @@
   },
   "devices": [
     {
-      "name": "Device 1",
-      "address": "192.168.31.160",
-      "port": 502,
-      "timeout": 1000
-    },
-    {
-      "name": "Device 2",
-      "address": "192.168.31.165",
-      "port": 502,
-      "timeout": 1000
+      "name": "ModbusDevice1",
+      "type": "rtu",
+      "path": "/dev/ttyUSB0",
+      "baudRate": 9600,
+      "dataBits": 8,
+      "stopBits": 1,
+      "parity": "none",
+      "slaveId": 1,
+      "timeout": 2000
     }
+
   ]
 }
