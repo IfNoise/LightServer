@@ -4,10 +4,11 @@ const net = require("net");
 const SerialPort = require("serialport");
 
 class ModbusDevice {
-  constructor(name, address, port = "502", timeout = 1000, type = "tcp", baudRate = 9600, dataBits = 8, stopBits = 1, parity = "none", unitId = 1) {
+  constructor(name, address, port = "502", timeout = 1000, type = "tcp", baudRate = 9600, dataBits = 8, stopBits = 1, parity = "none", unitId = 1, portsCount = 8) {
     this.name = name;
     this.type = type; // "tcp" or "rtu"
     this.unitId = unitId; // Modbus slave ID for RTU
+    this.portsCount = portsCount; // Number of ports/registers to read
     
     if (type === "rtu") {
       this.options = { 
@@ -63,16 +64,13 @@ class ModbusDevice {
       
       this.client = new modbus.client.RTU(this.serialPort, this.unitId);
       
+      // Для RTU устройств инициализируем массив портов нулями
+      this.ports = new Array(this.portsCount).fill(0);
+      
       this.serialPort.on('open', () => {
         console.log(`Serial port ${this.options.path} opened for ${this.name}`);
-        this.requestState().then((ports)=>{
-          this.ports=ports;
-        })
-        this.timer=setInterval(()=>{
-          this.requestState().then((ports)=>{
-            this.ports=ports;
-          })
-        },30000)
+        // Для RTU не делаем автоматический опрос состояния
+        // Состояние управляется только через команды записи
       });
       
       this.serialPort.on('error', (err) => {
@@ -124,27 +122,29 @@ class ModbusDevice {
         return new Promise((resolve, reject) => {
           try {
             if (!this.client || !this.serialPort || !this.serialPort.isOpen) {
-              reject([]);
+              // Если порт не открыт, возвращаем текущее состояние из памяти
+              resolve([...this.ports]);
               return;
             }
             
             this.client
-              .readHoldingRegisters(0, 8)
+              .readHoldingRegisters(0, this.portsCount)
               .then((resp) => {
                 this.ports = resp.response._body.valuesAsArray;
                 resolve([...this.ports]);
               })
               .catch((error) => {
                 console.log(error);
-                reject([]);
+                // При ошибке возвращаем текущее состояние
+                resolve([...this.ports]);
               });
           } catch (e) {
             console.log(e);
-            reject([]);
+            resolve([...this.ports]);
           }
         }).catch((e) => {
           console.log(e);
-          return [];
+          return [...this.ports];
         });
       } 
     
@@ -196,6 +196,8 @@ class ModbusDevice {
           this.client
             .writeMultipleRegisters(0, newState)
             .then((resp) => {
+              // Обновляем локальное состояние после успешной записи
+              this.ports = [...newState];
               resolve(resp.response._body.valuesAsArray);
             })
             .catch(() => {
@@ -254,6 +256,8 @@ class ModbusDevice {
           this.client
             .writeSingleRegister(port, newState)
             .then((resp) => {
+              // Обновляем локальное состояние после успешной записи
+              this.ports[port] = newState;
               resolve(resp.response._body);
             })
             .catch(() => {
@@ -308,21 +312,34 @@ class ModbusDevice {
     return new Promise((resolve, reject) => {
       try {
         if (!this.client || !this.serialPort || !this.serialPort.isOpen) {
-          reject([]);
+          // Если порт не открыт, возвращаем из локальной памяти
+          if (this.ports && port < this.ports.length) {
+            resolve([this.ports[port]]);
+          } else {
+            resolve([0]);
+          }
           return;
         }
         
         this.client
           .readHoldingRegisters(port, 1)
           .then((resp) => {
-            resolve(resp.response._body.valuesAsArray);
+            const value = resp.response._body.valuesAsArray[0];
+            // Обновляем локальное состояние
+            this.ports[port] = value;
+            resolve([value]);
           })
           .catch(() => {
-            reject([]);
+            // При ошибке возвращаем из локальной памяти
+            if (this.ports && port < this.ports.length) {
+              resolve([this.ports[port]]);
+            } else {
+              resolve([0]);
+            }
           });
       } catch (e) {
         console.log(e);
-        reject([]);
+        resolve([0]);
       }
     })
     .catch((e) => {
