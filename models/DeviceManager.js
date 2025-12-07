@@ -33,7 +33,23 @@ class DeviceManager {
 
   }
   addDevice(name,options) {
-    const device = new ModbusDevice(name,options.host,options.port);
+    let device;
+    if (options.type === "rtu") {
+      device = new ModbusDevice(
+        name,
+        options.path,
+        null,
+        options.timeout || 1000,
+        "rtu",
+        options.baudRate || 9600,
+        options.dataBits || 8,
+        options.stopBits || 1,
+        options.parity || "none",
+        options.unitId || 1
+      );
+    } else {
+      device = new ModbusDevice(name, options.host, options.port, options.timeout || 1000, "tcp");
+    }
     device.init();
     this.devices.push(device);
     this.saveDevices();
@@ -54,8 +70,8 @@ class DeviceManager {
   }
   getDevices() {
     const devices =this.devices.map((device) => {
-    const {name, options, ports } = device
-      return {name, options, ports };
+    const {name, options, ports, type } = device
+      return {name, options, ports, type };
     })
     return devices;
   }
