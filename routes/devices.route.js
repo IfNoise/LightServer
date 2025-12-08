@@ -28,7 +28,7 @@ router.get("/:name/state", async (req, res) => {
   }
 });
 router.post("/add", (req, res) => {
-  const { name, type, address, port, path, baudRate, dataBits, stopBits, parity, unitId, timeout } = req.body;
+  const { name, type, address, port, path, baudRate, dataBits, stopBits, parity, unitId, timeout, portsCount } = req.body;
   
   // Validate required fields based on device type
   if (!name) {
@@ -50,7 +50,8 @@ router.post("/add", (req, res) => {
       stopBits: stopBits || 1,
       parity: parity || "none",
       unitId: unitId || 1,
-      timeout: timeout || 1000
+      timeout: timeout || 1000,
+      portsCount: portsCount || 8
     };
   } else {
     // TCP device (default)
@@ -61,7 +62,8 @@ router.post("/add", (req, res) => {
       type: "tcp",
       host: address,
       port: port || "502",
-      timeout: timeout || 1000
+      timeout: timeout || 1000,
+      portsCount: portsCount || 8
     };
   }
   

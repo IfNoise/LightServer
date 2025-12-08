@@ -20,6 +20,8 @@ class ModbusDevice {
         parity: parity,
         timeout: timeout
       };
+      // Для RTU устройств инициализируем массив портов нулями сразу
+      this.ports = new Array(portsCount).fill(0);
     } else {
       this.options = { 
         name: name, 
@@ -27,9 +29,9 @@ class ModbusDevice {
         port: port, 
         timeout: timeout 
       };
+      this.ports = null;
     }
     
-    this.ports = null;
     this.timer = null;
     this.serialPort = null;
     this.client = null;
@@ -63,9 +65,6 @@ class ModbusDevice {
       });
       
       this.client = new modbus.client.RTU(this.serialPort, this.unitId);
-      
-      // Для RTU устройств инициализируем массив портов нулями
-      this.ports = new Array(this.portsCount).fill(0);
       
       this.serialPort.on('open', () => {
         console.log(`Serial port ${this.options.path} opened for ${this.name}`);

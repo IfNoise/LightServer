@@ -23,9 +23,26 @@ class DeviceManager {
   }
   saveDevices() {
     const tempDevices=this.devices.map((device)=>{
-      return {name:device.name,options:device.options}
-    }
-    )
+      const options = {
+        type: device.type,
+        timeout: device.options.timeout,
+        portsCount: device.portsCount
+      };
+      
+      if (device.type === "rtu") {
+        options.path = device.options.path;
+        options.baudRate = device.options.baudRate;
+        options.dataBits = device.options.dataBits;
+        options.stopBits = device.options.stopBits;
+        options.parity = device.options.parity;
+        options.unitId = device.unitId;
+      } else {
+        options.host = device.options.host;
+        options.port = device.options.port;
+      }
+      
+      return {name: device.name, options: options};
+    })
     this.localStorage.setItem('devices',JSON.stringify( tempDevices));
   }
   init() {
@@ -45,10 +62,11 @@ class DeviceManager {
         options.dataBits || 8,
         options.stopBits || 1,
         options.parity || "none",
-        options.unitId || 1
+        options.unitId || 1,
+        options.portsCount || 8
       );
     } else {
-      device = new ModbusDevice(name, options.host, options.port, options.timeout || 1000, "tcp");
+      device = new ModbusDevice(name, options.host, options.port, options.timeout || 1000, "tcp", 9600, 8, 1, "none", 1, options.portsCount || 8);
     }
     device.init();
     this.devices.push(device);
