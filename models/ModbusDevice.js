@@ -4,7 +4,7 @@ const net = require("net");
 const SerialPort = require("serialport");
 
 class ModbusDevice {
-  constructor(name, address, port = "502", timeout = 1000, type = "tcp", baudRate = 9600, dataBits = 8, stopBits = 1, parity = "none", unitId = 1, portsCount = 8) {
+  constructor(name, address, port, timeout = 1000, type = "rtu", baudRate = 9600, dataBits = 8, stopBits = 1, parity = "none", unitId = 1, portsCount = 8) {
     this.name = name;
     this.type = type; // "tcp" or "rtu"
     this.unitId = unitId; // Modbus slave ID for RTU
