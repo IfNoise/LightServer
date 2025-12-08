@@ -6,7 +6,7 @@
     {
       "name": "ModbusDevice1",
       "type": "rtu",
-      "path": "/dev/ttyUSB0",
+      "path": "/dev/ttyUSB2",
       "baudRate": 9600,
       "dataBits": 8,
       "stopBits": 1,
