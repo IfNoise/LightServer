@@ -1,7 +1,7 @@
 // Description: ModbusDevice model to interact with modbus devices.
 const modbus = require("jsmodbus");
 const net = require("net");
-const SerialPort = require("serialport");
+const { SerialPort } = require("serialport");
 
 class ModbusDevice {
   constructor(name, address, port, timeout = 1000, type = "rtu", baudRate = 9600, dataBits = 8, stopBits = 1, parity = "none", unitId = 1, portsCount = 8) {
@@ -57,7 +57,8 @@ class ModbusDevice {
   
   initRTU() {
     try {
-      this.serialPort = new SerialPort(this.options.path, {
+      this.serialPort = new SerialPort({
+        path: this.options.path,
         baudRate: this.options.baudRate,
         dataBits: this.options.dataBits,
         stopBits: this.options.stopBits,
