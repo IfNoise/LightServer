@@ -15,6 +15,7 @@ class LightChannel {
   }
   init() {
     this.maxLevel = parseInt(this.localStorage.getItem("maxLevel")) || 0;
+    this.currentPercentage = 0; // Инициализируем текущий процент
   }
   setDevice(device) {
     try {
@@ -47,11 +48,14 @@ class LightChannel {
         throw new Error("Max level must be a number");
       }
       this.maxLevel = maxLevel;
-      if (this.manual) {
+      this.localStorage.setItem("maxLevel", this.maxLevel);
+      
+      // Уведомляем о изменении maxLevel для пересчета текущего уровня
+      if (this.currentPercentage !== undefined) {
+        this.setPersentage(this.currentPercentage);
+      } else if (this.manual) {
         this.setPersentage(100);
       }
-
-      this.localStorage.setItem("maxLevel", this.maxLevel);
     } catch (e) {
       console.log(e.message);
       return;
@@ -65,6 +69,10 @@ class LightChannel {
       if (persentage < 0 || persentage > 100) {
         throw new Error("Persentage must be between 0 and 100");
       }
+      
+      // Сохраняем текущий процент для пересчета при изменении maxLevel
+      this.currentPercentage = persentage;
+      
       const newLevel =
         persentage === 0 ? 0 : Math.floor((this.maxLevel * persentage) / 100);
       if (newLevel == this.level) {
