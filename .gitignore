@@ -1,6 +1,8 @@
-node_modules
-storage
-
+node_modules/
+storage/
+coverage/
+*.log
+.env
 
 #Ignore vscode AI rules
 .github/instructions/codacy.instructions.md

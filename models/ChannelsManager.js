@@ -1,12 +1,11 @@
 const LocalStorage = require("node-localstorage").LocalStorage;
-const c = require("config");
 const LightChannel = require("./LightChannel");
 
 class ChannelsManager {
   static instance = null;
   constructor(deviceManager) {
     this.channels = [];
-    this.localStorage = new LocalStorage("./storage/channels");
+    this.localStorage = new LocalStorage(process.env.STORAGE_CHANNELS || "./storage/channels");
     this.deviceManager = deviceManager;
   }
 

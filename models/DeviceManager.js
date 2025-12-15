@@ -5,7 +5,7 @@ class DeviceManager {
   static instance = null;
   constructor() {
     this.devices = [];
-    this.localStorage = new LocalStorage('./storage/devices');
+    this.localStorage = new LocalStorage(process.env.STORAGE_DEVICES || './storage/devices');
   }
   static getInstance() {
     if (!DeviceManager.instance) {

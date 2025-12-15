@@ -6,15 +6,19 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node app.js",
     "server": "nodemon app.js",
-    "dev": "cross-env NODE_ENV=development npm run server"
+    "dev": "cross-env NODE_ENV=development npm run server",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "author": "If_noise",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.20.2",
+    "body-parser": "^1.20.3",
     "config": "^3.3.11",
     "cors": "^2.8.5",
-    "express": "^4.19.2",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
     "jsmodbus": "^4.0.10",
     "node-localstorage": "^3.0.5",
     "serialport": "^13.0.0"
@@ -22,6 +26,8 @@
   "devDependencies": {
     "concurrently": "^8.2.2",
     "cross-env": "^7.0.3",
-    "nodemon": "^3.1.0"
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.0",
+    "supertest": "^7.1.4"
   }
 }

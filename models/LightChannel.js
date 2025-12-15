@@ -1,5 +1,3 @@
-const c = require("config");
-
 const LocalStorage = require("node-localstorage").LocalStorage;
 
 class LightChannel {

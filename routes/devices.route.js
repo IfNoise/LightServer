@@ -17,6 +17,37 @@ router.get("/:name", (req, res) => {
     res.json({ status: "error" });
   }
 });
+router.patch("/:name", (req, res) => {
+  const { name } = req.params;
+  const device = deviceManager.getDevice(name);
+  if (device) {
+    const { timeout, port, path, baudRate, dataBits, stopBits, parity, unitId, host } = req.body;
+    if (timeout !== undefined) device.options.timeout = timeout;
+    if (port !== undefined && device.type === "tcp") device.options.port = port;
+    if (host !== undefined && device.type === "tcp") device.options.host = host;
+    if (path !== undefined && device.type === "rtu") device.options.path = path;
+    if (baudRate !== undefined && device.type === "rtu") device.options.baudRate = baudRate;
+    if (dataBits !== undefined && device.type === "rtu") device.options.dataBits = dataBits;
+    if (stopBits !== undefined && device.type === "rtu") device.options.stopBits = stopBits;
+    if (parity !== undefined && device.type === "rtu") device.options.parity = parity;
+    if (unitId !== undefined && device.type === "rtu") device.unitId = unitId;
+    
+    deviceManager.saveDevices();
+    res.json({ status: "ok" });
+  } else {
+    res.json({ status: "error" });
+  }
+});
+router.delete("/:name", (req, res) => {
+  const { name } = req.params;
+  const device = deviceManager.getDevice(name);
+  if (device) {
+    deviceManager.removeDevice(device);
+    res.json({ status: "ok" });
+  } else {
+    res.json({ status: "error" });
+  }
+});
 router.get("/:name/state", async (req, res) => {
   const { name } = req.params;
   const device = deviceManager.getDevice(name);
@@ -75,16 +106,6 @@ router.post("/add", (req, res) => {
   }
 });
 
-router.post("/remove", (req, res) => {
-  const { name } = req.body;
-  const device = deviceManager.getDevice(name);
-  if (device) {
-    deviceManager.removeDevice(device);
-    res.json({ status: "ok" });
-  } else {
-    res.json({ status: "error" });
-  }
-});
 module.exports = router;
 
 

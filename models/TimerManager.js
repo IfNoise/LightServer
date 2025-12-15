@@ -17,7 +17,7 @@ class TimerManager {
     TimerManager.instance = this;
     this.timers = [];
     this.channelManager = channelManager;
-    this.localStorage = new LocalStorage("./storage/timers");
+    this.localStorage = new LocalStorage(process.env.STORAGE_TIMERS || "./storage/timers");
   }
   static getInstance(channelManager) {
     if (!TimerManager.instance) {
