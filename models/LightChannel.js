@@ -72,6 +72,10 @@ class LightChannel {
         throw new Error("Persentage must be between 0 and 100");
       }
       
+      if (!this.device) {
+        throw new Error("Device not set");
+      }
+      
       // Сохраняем текущий процент для пересчета при изменении maxLevel
       this.currentPercentage = persentage;
       
@@ -81,22 +85,23 @@ class LightChannel {
         return { status: "ok", message: "Level already set" };
       }
       this.level = newLevel;
-      console.log("Timer", this.name, "set level", this.level);
+      console.log("Channel", this.name, "set level", this.level, `(${persentage}%)`);
+      
       const res = await this.device.updatePort(this.port, this.level);
-      if (res) {
-        console.log(
-          "Port",
-          this.port,
-          "set to",
-          this.level,
-          Math.floor((this.level / 32767) * 100),
-          "%"
-        );
-        console.log("res", res);
-      }
+      console.log(
+        "Port",
+        this.port,
+        "set to",
+        this.level,
+        Math.floor((this.level / 32767) * 100),
+        "%",
+        "Result:",
+        res
+      );
+      
       return { status: "ok" };
     } catch (e) {
-      console.error(e);
+      console.error(`Channel ${this.name} setPersentage error:`, e);
       return { status: "error", message: e.message };
     }
   }

@@ -42,9 +42,15 @@ class TimerManager {
 
         // Подписываемся на события таймера
         newTimer.on("stateUpdate", async ({ brightness, channels }) => {
-          await Promise.all(
-            channels.map(channel => channel.setPersentage(brightness))
+          console.log(`Timer ${timer.name} stateUpdate: brightness=${brightness}, channels count=${channels.length}`);
+          const results = await Promise.all(
+            channels.map(async (channel) => {
+              const result = await channel.setPersentage(brightness);
+              console.log(`  Channel ${channel.name} update result:`, result);
+              return result;
+            })
           );
+          console.log(`Timer ${timer.name} update completed`);
         });
 
         newTimer.on("error", (error) => {
@@ -109,9 +115,15 @@ class TimerManager {
       
       // Подписываемся на события таймера
       timer.on("stateUpdate", async ({ brightness, channels }) => {
-        await Promise.all(
-          channels.map(channel => channel.setPersentage(brightness))
+        console.log(`Timer ${name} stateUpdate: brightness=${brightness}, channels count=${channels.length}`);
+        const results = await Promise.all(
+          channels.map(async (channel) => {
+            const result = await channel.setPersentage(brightness);
+            console.log(`  Channel ${channel.name} update result:`, result);
+            return result;
+          })
         );
+        console.log(`Timer ${name} update completed`);
       });
 
       timer.on("error", (error) => {
