@@ -48,10 +48,13 @@ class LightChannel {
       if (Number.isNaN(maxLevel)) {
         throw new Error("Max level must be a number");
       }
+      const oldMaxLevel = this.maxLevel;
       this.maxLevel = maxLevel;
       this.localStorage.setItem("maxLevel", this.maxLevel);
       
-      // Уведомляем о изменении maxLevel для пересчета текущего уровня
+      console.log(`MaxLevel changed from ${oldMaxLevel} to ${maxLevel} for channel ${this.name}`);
+      
+      // Пересчитываем и обновляем уровень на устройстве
       if (this.currentPercentage !== undefined) {
         await this.setPersentage(this.currentPercentage);
       } else if (this.manual) {
@@ -81,9 +84,9 @@ class LightChannel {
       
       const newLevel =
         persentage === 0 ? 0 : Math.floor((this.maxLevel * persentage) / 100);
-      if (newLevel == this.level) {
-        return { status: "ok", message: "Level already set" };
-      }
+      
+      // Всегда обновляем устройство, даже если level не изменился
+      // (реальное состояние устройства могло быть изменено извне)
       this.level = newLevel;
       console.log("Channel", this.name, "set level", this.level, `(${persentage}%)`);
       
