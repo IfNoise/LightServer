@@ -223,50 +223,87 @@ class ModbusDevice {
   updatePortTCP(port, newState) {
       return new Promise((resolve, reject) => {
         try {
+          console.log(`[ModbusDevice:${this.name}] TCP updatePort: port=${port}, value=${newState}`);
           const socket = new net.Socket();
           const client = new modbus.client.TCP(socket);
-          socket.on("connect", function () {
+          
+          socket.on("error", (err) => {
+            console.error(`[ModbusDevice:${this.name}] TCP socket error:`, err);
+            reject(err);
+          });
+          
+          socket.on("connect", () => {
+            console.log(`[ModbusDevice:${this.name}] TCP connected, writing register...`);
             client
               .writeSingleRegister(port, newState)
-              .then(function (resp) {
+              .then((resp) => {
+                console.log(`[ModbusDevice:${this.name}] TCP write success:`, resp.response._body);
                 resolve(resp.response._body);
                 socket.end();
               })
-              .catch(function () {
-                reject([]);
+              .catch((err) => {
+                console.error(`[ModbusDevice:${this.name}] TCP write failed:`, err);
+                reject(err);
                 socket.end();
               });
           });
           socket.connect(this.options);
         } catch (e) {
-          console.log(e);
-          reject([]);
+          console.error(`[ModbusDevice:${this.name}] TCP exception:`, e);
+          reject(e);
         }
+      }).catch((e) => {
+        console.error(`[ModbusDevice:${this.name}] TCP updatePort final error:`, e);
+        throw e;
       });
     }
     
   updatePortRTU(port, newState) {
       return new Promise((resolve, reject) => {
         try {
-          if (!this.client || !this.serialPort || !this.serialPort.isOpen) {
-            reject([]);
+          console.log(`[ModbusDevice:${this.name}] RTU updatePort: port=${port}, value=${newState}`);
+          
+          if (!this.client) {
+            const err = new Error("RTU client not initialized");
+            console.error(`[ModbusDevice:${this.name}]`, err.message);
+            reject(err);
             return;
           }
           
+          if (!this.serialPort) {
+            const err = new Error("Serial port not initialized");
+            console.error(`[ModbusDevice:${this.name}]`, err.message);
+            reject(err);
+            return;
+          }
+          
+          if (!this.serialPort.isOpen) {
+            const err = new Error(`Serial port ${this.options.path} is not open`);
+            console.error(`[ModbusDevice:${this.name}]`, err.message);
+            reject(err);
+            return;
+          }
+          
+          console.log(`[ModbusDevice:${this.name}] RTU writing to register ${port}...`);
           this.client
             .writeSingleRegister(port, newState)
             .then((resp) => {
               // Обновляем локальное состояние после успешной записи
               this.ports[port] = newState;
+              console.log(`[ModbusDevice:${this.name}] RTU write success, port ${port} set to ${newState}`);
               resolve(resp.response._body);
             })
-            .catch(() => {
-              reject([]);
+            .catch((err) => {
+              console.error(`[ModbusDevice:${this.name}] RTU write failed:`, err);
+              reject(err);
             });
         } catch (e) {
-          console.log(e);
-          reject([]);
+          console.error(`[ModbusDevice:${this.name}] RTU exception:`, e);
+          reject(e);
         }
+      }).catch((e) => {
+        console.error(`[ModbusDevice:${this.name}] RTU updatePort final error:`, e);
+        throw e;
       });
     } 
   
