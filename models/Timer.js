@@ -217,12 +217,16 @@ class Timer extends EventEmitter {
     const period = this.#calculateDayPeriod(currentMinutes);
     const brightness = this.#calculateBrightness(currentMinutes, period);
 
+    console.log(`[Timer:${this.name}] #updateState: currentTime=${now.getHours()}:${now.getMinutes()} (${currentMinutes}min), sunriseTime=${this.sunriseTime}, sunsetTime=${this.sunsetTime}, period=${period}, brightness=${brightness}, channels=${this.channels.size}`);
+    
     this.emit("stateUpdate", {
       period,
       brightness,
       currentTime: currentMinutes,
       channels: Array.from(this.channels),
     });
+    
+    console.log(`[Timer:${this.name}] stateUpdate event emitted`);
   }
 
   json() {
@@ -239,18 +243,26 @@ class Timer extends EventEmitter {
   }
 
   start() {
-    if (this.#state === TIMER_STATES.STARTED) return;
+    if (this.#state === TIMER_STATES.STARTED) {
+      console.log(`[Timer:${this.name}] Already started, skipping`);
+      return;
+    }
 
+    console.log(`[Timer:${this.name}] Starting timer with interval ${CONSTANTS.TIMER_INTERVAL}ms`);
+    
     this.timer = setInterval(() => {
       try {
         this.#updateState();
       } catch (error) {
+        console.error(`[Timer:${this.name}] Error in updateState:`, error);
         this.emit("error", error);
       }
     }, CONSTANTS.TIMER_INTERVAL);
 
     this.#state = TIMER_STATES.STARTED;
     this.#saveToStorage("state", this.#state);
+    
+    console.log(`[Timer:${this.name}] Timer started successfully`);
     this.emit("started");
   }
 
