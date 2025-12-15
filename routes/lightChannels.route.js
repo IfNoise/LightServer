@@ -44,17 +44,17 @@ router.get("/:name/state", async (req, res) => {
 router.post("/add", (req, res) => {
   const { name, device, port } = req.body;
 
-  channelManager.addChannel({ name, device, port });
-  res.json({ status: "ok" });
+  const result = channelManager.addChannel({ name, device, port });
+  res.json(result);
 });
 
 router.post("/remove", (req, res) => {
   const { name } = req.body;
   if (name) {
-    channelManager.removeChannel(name);
-    res.json({ status: "ok" });
+    const result = channelManager.removeChannel(name);
+    res.json(result);
   } else {
-    res.json({ status: "error" });
+    res.json({ status: "error", message: "Channel name is required" });
   }
 });
 

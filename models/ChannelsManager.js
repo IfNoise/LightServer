@@ -45,16 +45,17 @@ class ChannelsManager {
   addChannel(channel) {
     try {
       const { name, device: deviceName, port } = channel;
+      if (!name) {
+        throw new Error("Channel name is required");
+      }
       if (this.channels.find((c) => c.name === name)) {
         throw new Error("Channel already exists");
       }
-      if (
-        deviceName === undefined ||
-        deviceName === "" ||
-        port === undefined ||
-        port === ""
-      ) {
-        throw new Error("Invalid parameters");
+      if (deviceName === undefined || deviceName === "") {
+        throw new Error("Device name is required");
+      }
+      if (port === undefined || port === null) {
+        throw new Error("Port is required");
       }
       if (!this.deviceManager.getDevice(deviceName)) {
         throw new Error("Device not found");
@@ -86,15 +87,7 @@ class ChannelsManager {
   }
 
   getChannels() {
-    try {
-      if (this.channels.length === 0) {
-        throw new Error("No channels found");
-      }
-      return this.channels;
-    } catch (e) {
-      console.log(e);
-      return { status: "error", message: e.message };
-    }
+    return this.channels;
   }
   getChannelsJSON() {
     if (this.channels.length === 0) {

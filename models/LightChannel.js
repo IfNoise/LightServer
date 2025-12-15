@@ -9,7 +9,8 @@ class LightChannel {
     this.level = 0;
     this.manual = true;
     //this.nightMode=true;
-    this.localStorage = new LocalStorage("./storage/channels/" + name);
+    const storagePath = process.env.STORAGE_CHANNELS || "./storage/channels";
+    this.localStorage = new LocalStorage(storagePath + "/" + name);
   }
   init() {
     this.maxLevel = parseInt(this.localStorage.getItem("maxLevel")) || 0;
@@ -19,13 +20,14 @@ class LightChannel {
     try {
       if (this.device) {
         if (this.device.name == device.name) {
-          return;
+          return { status: "ok", message: "Device already set" };
         }
       }
       this.device = device;
+      return { status: "ok" };
     } catch (e) {
-      console.log(e.message);
-      return;
+      console.error(e);
+      return { status: "error", message: e.message };
     }
   }
   setPort(port) {
@@ -35,9 +37,10 @@ class LightChannel {
       }
       this.port = port;
       this.localStorage.setItem("port", port);
+      return { status: "ok" };
     } catch (e) {
-      console.log(e.message);
-      return;
+      console.error(e);
+      return { status: "error", message: e.message };
     }
   }
   setMaxLevel(maxLevel) {
@@ -54,9 +57,10 @@ class LightChannel {
       } else if (this.manual) {
         this.setPersentage(100);
       }
+      return { status: "ok" };
     } catch (e) {
-      console.log(e.message);
-      return;
+      console.error(e);
+      return { status: "error", message: e.message };
     }
   }
   async setPersentage(persentage) {
@@ -74,7 +78,7 @@ class LightChannel {
       const newLevel =
         persentage === 0 ? 0 : Math.floor((this.maxLevel * persentage) / 100);
       if (newLevel == this.level) {
-        return;
+        return { status: "ok", message: "Level already set" };
       }
       this.level = newLevel;
       console.log("Timer", this.name, "set level", this.level);
@@ -90,9 +94,10 @@ class LightChannel {
         );
         console.log("res", res);
       }
+      return { status: "ok" };
     } catch (e) {
-      console.log(e.message);
-      return;
+      console.error(e);
+      return { status: "error", message: e.message };
     }
   }
 
@@ -107,15 +112,14 @@ class LightChannel {
   }
   async getState() {
     try {
-      if (this.device) {
-        const ports = await this.device.requestState();
-        return ports[this.port];
-      } else {
+      if (!this.device) {
         throw new Error("Device not set");
       }
+      const ports = await this.device.requestState();
+      return ports[this.port];
     } catch (e) {
-      console.log(e.message);
-      return;
+      console.error(e);
+      return { status: "error", message: e.message };
     }
   }
 }
