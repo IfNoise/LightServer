@@ -58,15 +58,15 @@ router.post("/remove", (req, res) => {
   }
 });
 
-router.post("/:name/setMaxLevel", (req, res) => {
+router.post("/:name/setMaxLevel", async (req, res) => {
   const { name } = req.params;
   const { maxLevel } = req.body;
   const channel = channelManager.getChannel(name);
   if (channel) {
-    channel.setMaxLevel(maxLevel);
-    res.json({ status: "ok" });
+    const result = await channel.setMaxLevel(maxLevel);
+    res.json(result);
   } else {
-    res.json({ status: "error" });
+    res.json({ status: "error", message: "Channel not found" });
   }
 });
 

@@ -41,10 +41,10 @@ class TimerManager {
         newTimer.setSunsetTime(timer.sunsetTime);
 
         // Подписываемся на события таймера
-        newTimer.on("stateUpdate", ({ brightness, channels }) => {
-          channels.forEach((channel) => {
-            channel.setPersentage(brightness);
-          });
+        newTimer.on("stateUpdate", async ({ brightness, channels }) => {
+          await Promise.all(
+            channels.map(channel => channel.setPersentage(brightness))
+          );
         });
 
         newTimer.on("error", (error) => {
@@ -106,6 +106,18 @@ class TimerManager {
       timer.setStepTime(stepTime);
       timer.setSunriseTime(sunriseTime);
       timer.setSunsetTime(sunsetTime);
+      
+      // Подписываемся на события таймера
+      timer.on("stateUpdate", async ({ brightness, channels }) => {
+        await Promise.all(
+          channels.map(channel => channel.setPersentage(brightness))
+        );
+      });
+
+      timer.on("error", (error) => {
+        console.error(`Timer ${name} error:`, error);
+      });
+      
       timer.init();
       this.timers.push(timer);
       this.saveTimers();

@@ -43,7 +43,7 @@ class LightChannel {
       return { status: "error", message: e.message };
     }
   }
-  setMaxLevel(maxLevel) {
+  async setMaxLevel(maxLevel) {
     try {
       if (Number.isNaN(maxLevel)) {
         throw new Error("Max level must be a number");
@@ -53,9 +53,9 @@ class LightChannel {
       
       // Уведомляем о изменении maxLevel для пересчета текущего уровня
       if (this.currentPercentage !== undefined) {
-        this.setPersentage(this.currentPercentage);
+        await this.setPersentage(this.currentPercentage);
       } else if (this.manual) {
-        this.setPersentage(100);
+        await this.setPersentage(100);
       }
       return { status: "ok" };
     } catch (e) {
