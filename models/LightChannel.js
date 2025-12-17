@@ -53,7 +53,7 @@ class LightChannel {
       this.maxLevel = Math.round(maxLevel);
       this.localStorage.setItem("maxLevel", this.maxLevel);
       
-      console.log(`MaxLevel changed from ${oldMaxLevel} to ${maxLevel} for channel ${this.name}`);
+      console.log(`MaxLevel changed from ${oldMaxLevel} to ${this.maxLevel} for channel ${this.name}`);
       
       // Пересчитываем и обновляем уровень на устройстве
       if (this.currentPercentage !== undefined) {
