@@ -1,5 +1,6 @@
-runtimes:
-    - dart@3.7.2
+tools:
+    - pylint@3.3.6
+
     - go@1.22.3
     - java@17.0.10
     - node@22.2.0

@@ -49,7 +49,8 @@ class LightChannel {
         throw new Error("Max level must be a number");
       }
       const oldMaxLevel = this.maxLevel;
-      this.maxLevel = maxLevel;
+      // Округляем до целого числа для Modbus регистров
+      this.maxLevel = Math.round(maxLevel);
       this.localStorage.setItem("maxLevel", this.maxLevel);
       
       console.log(`MaxLevel changed from ${oldMaxLevel} to ${maxLevel} for channel ${this.name}`);
@@ -94,7 +95,8 @@ class LightChannel {
       
       // Всегда обновляем устройство, даже если level не изменился
       // (реальное состояние устройства могло быть изменено извне)
-      this.level = newLevel;
+      // Округляем level до целого числа
+      this.level = Math.round(newLevel);
       console.log("Channel", this.name, "calculated level", this.level, `from ${persentage}% of maxLevel ${this.maxLevel}`);
       
       const res = await this.device.updatePort(this.port, this.level);
