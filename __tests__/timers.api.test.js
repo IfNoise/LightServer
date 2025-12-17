@@ -74,8 +74,9 @@ describe('Timers API', () => {
 
       const response = await request(app).get('/api/timers/NonExistent');
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({ status: 'error' });
+      expect(response.status).toBe(404);
+      expect(response.body.status).toBe('error');
+      expect(response.body.message).toBe('Timer not found');
     });
   });
 
@@ -129,8 +130,9 @@ describe('Timers API', () => {
         .post('/api/timers/NonExistent/setSteps')
         .send({ steps: 20 });
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(404);
       expect(response.body.status).toBe('error');
+      expect(response.body.message).toBe('Timer not found');
     });
   });
 

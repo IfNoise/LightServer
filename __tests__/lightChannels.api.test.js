@@ -75,13 +75,16 @@ describe('LightChannels API', () => {
 
       const response = await request(app).get('/api/lightChannels/NonExistent');
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({ status: 'error' });
+      expect(response.status).toBe(404);
+      expect(response.body.status).toBe('error');
+      expect(response.body.message).toBe('Channel not found');
     });
   });
 
   describe('POST /api/lightChannels/add', () => {
     test('should add channel successfully', async () => {
+      mockChannelsManager.addChannel.mockReturnValue({ status: 'ok' });
+
       const response = await request(app)
         .post('/api/lightChannels/add')
         .send({
@@ -91,7 +94,6 @@ describe('LightChannels API', () => {
         });
 
       expect(response.status).toBe(200);
-      expect(response.body.status).toBe('ok');
       expect(mockChannelsManager.addChannel).toHaveBeenCalledWith({
         name: 'NewChannel',
         device: 'Device1',
@@ -102,12 +104,13 @@ describe('LightChannels API', () => {
 
   describe('POST /api/lightChannels/remove', () => {
     test('should remove channel successfully', async () => {
+      mockChannelsManager.removeChannel.mockReturnValue({ status: 'ok' });
+
       const response = await request(app)
         .post('/api/lightChannels/remove')
         .send({ name: 'Channel1' });
 
       expect(response.status).toBe(200);
-      expect(response.body.status).toBe('ok');
       expect(mockChannelsManager.removeChannel).toHaveBeenCalledWith('Channel1');
     });
 
@@ -116,7 +119,7 @@ describe('LightChannels API', () => {
         .post('/api/lightChannels/remove')
         .send({});
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(400);
       expect(response.body.status).toBe('error');
     });
   });
@@ -125,7 +128,7 @@ describe('LightChannels API', () => {
     test('should update channel maxLevel', async () => {
       const mockChannel = {
         name: 'Channel1',
-        setMaxLevel: jest.fn(),
+        setMaxLevel: jest.fn().mockResolvedValue({ status: 'ok' }),
       };
       mockChannelsManager.getChannel.mockReturnValue(mockChannel);
 
@@ -134,7 +137,6 @@ describe('LightChannels API', () => {
         .send({ maxLevel: 32767 });
 
       expect(response.status).toBe(200);
-      expect(response.body.status).toBe('ok');
       expect(mockChannel.setMaxLevel).toHaveBeenCalledWith(32767);
     });
 
@@ -145,8 +147,9 @@ describe('LightChannels API', () => {
         .post('/api/lightChannels/NonExistent/setMaxLevel')
         .send({ maxLevel: 32767 });
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(404);
       expect(response.body.status).toBe('error');
+      expect(response.body.message).toBe('Channel not found');
     });
   });
 

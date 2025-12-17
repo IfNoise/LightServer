@@ -111,9 +111,22 @@ class Timer extends EventEmitter {
   }
 
   #isNightTime(currentTime, isNormalMode) {
-    return isNormalMode
-      ? currentTime < this.sunriseTime || currentTime > this.sunsetTime
-      : currentTime > this.sunsetTime && currentTime < this.sunriseTime;
+    // Обычный режим: sunrise < sunset (например, 6:00 < 22:00)
+    // День: между sunrise и sunset (6:00 - 22:00)
+    // Ночь: до sunrise или после sunset
+    
+    // Инвертированный режим: sunrise > sunset (например, 15:00 > 3:00)
+    // День: от sunrise до конца дня + от начала дня до sunset (15:00 - 00:00 и 00:00 - 3:00)
+    // Ночь: между sunset и sunrise (3:00 - 15:00)
+    
+    if (isNormalMode) {
+      // Обычный режим
+      return currentTime < this.sunriseTime || currentTime > this.sunsetTime;
+    } else {
+      // Инвертированный режим
+      // Ночь = между sunset и sunrise
+      return currentTime >= this.sunsetTime && currentTime < this.sunriseTime;
+    }
   }
   getChannels() {
     return Array.from(this.channels).map((channel) => channel.name) || []; // Возвращаем массив имен каналов

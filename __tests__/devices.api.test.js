@@ -69,8 +69,9 @@ describe('Devices API', () => {
 
       const response = await request(app).get('/api/devices/NonExistent');
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({ status: 'error' });
+      expect(response.status).toBe(404);
+      expect(response.body.status).toBe('error');
+      expect(response.body.message).toBe('Device not found');
     });
   });
 
@@ -205,8 +206,9 @@ describe('Devices API', () => {
       const response = await request(app)
         .delete('/api/devices/NonExistent');
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(404);
       expect(response.body.status).toBe('error');
+      expect(response.body.message).toBe('Device not found');
     });
   });
 
@@ -322,8 +324,9 @@ describe('Devices API', () => {
         .patch('/api/devices/NonExistent')
         .send({ timeout: 2000 });
 
-      expect(response.status).toBe(200);
+      expect(response.status).toBe(404);
       expect(response.body.status).toBe('error');
+      expect(response.body.message).toBe('Device not found');
     });
   });
 
@@ -346,8 +349,9 @@ describe('Devices API', () => {
 
       const response = await request(app).get('/api/devices/NonExistent/state');
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({ status: 'error' });
+      expect(response.status).toBe(404);
+      expect(response.body.status).toBe('error');
+      expect(response.body.message).toBe('Device not found');
     });
   });
 });
