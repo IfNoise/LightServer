@@ -229,8 +229,6 @@ class Timer extends EventEmitter {
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
     const period = this.#calculateDayPeriod(currentMinutes);
     const brightness = this.#calculateBrightness(currentMinutes, period);
-
-    console.log(`[Timer:${this.name}] #updateState: currentTime=${now.getHours()}:${now.getMinutes()} (${currentMinutes}min), sunriseTime=${this.sunriseTime}, sunsetTime=${this.sunsetTime}, period=${period}, brightness=${brightness}, channels=${this.channels.size}`);
     
     this.emit("stateUpdate", {
       period,
@@ -238,8 +236,6 @@ class Timer extends EventEmitter {
       currentTime: currentMinutes,
       channels: Array.from(this.channels),
     });
-    
-    console.log(`[Timer:${this.name}] stateUpdate event emitted`);
   }
 
   json() {

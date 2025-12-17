@@ -261,8 +261,6 @@ class ModbusDevice {
   updatePortRTU(port, newState) {
       return new Promise((resolve, reject) => {
         try {
-          console.log(`[ModbusDevice:${this.name}] RTU updatePort: port=${port}, value=${newState}`);
-          
           if (!this.client) {
             const err = new Error("RTU client not initialized");
             console.error(`[ModbusDevice:${this.name}]`, err.message);
@@ -284,13 +282,11 @@ class ModbusDevice {
             return;
           }
           
-          console.log(`[ModbusDevice:${this.name}] RTU writing to register ${port}...`);
           this.client
             .writeSingleRegister(port, newState)
             .then((resp) => {
               // Обновляем локальное состояние после успешной записи
               this.ports[port] = newState;
-              console.log(`[ModbusDevice:${this.name}] RTU write success, port ${port} set to ${newState}`);
               resolve(resp.response._body);
             })
             .catch((err) => {

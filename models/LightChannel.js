@@ -14,7 +14,7 @@ class LightChannel {
   }
   init() {
     this.maxLevel = parseInt(this.localStorage.getItem("maxLevel")) || 0;
-    this.currentPercentage = 0; // Инициализируем текущий процент
+    // currentPercentage остается undefined, пока не будет явно установлен
   }
   setDevice(device) {
     try {
@@ -69,8 +69,6 @@ class LightChannel {
   }
   async setPersentage(persentage) {
     try {
-      console.log(`[setPersentage] Channel ${this.name}: percentage=${persentage}, manual=${this.manual}, maxLevel=${this.maxLevel}, device=${this.device?.name || 'null'}`);
-      
       if (Number.isNaN(persentage)) {
         throw new Error("Persentage must be a number");
       }
@@ -83,7 +81,7 @@ class LightChannel {
       }
       
       if (this.maxLevel === 0) {
-        console.warn(`[WARNING] Channel ${this.name} has maxLevel=0! Cannot calculate brightness. Please set maxLevel first.`);
+        console.warn(`[WARNING] Channel ${this.name} has maxLevel=0! Cannot calculate brightness.`);
         return { status: "error", message: "maxLevel is 0, cannot set brightness" };
       }
       
@@ -97,16 +95,8 @@ class LightChannel {
       // (реальное состояние устройства могло быть изменено извне)
       // Округляем level до целого числа
       this.level = Math.round(newLevel);
-      console.log("Channel", this.name, "calculated level", this.level, `from ${persentage}% of maxLevel ${this.maxLevel}`);
       
       const res = await this.device.updatePort(this.port, this.level);
-      console.log(
-        "Port",
-        this.port,
-        "update result:",
-        res,
-        `(requested level: ${this.level})`
-      );
       
       return { status: "ok" };
     } catch (e) {
