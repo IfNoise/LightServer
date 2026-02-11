@@ -1,5 +1,6 @@
 import TimerManager from '../models/TimerManager.js';
 import ChannelsManager from '../models/ChannelsManager.js';
+import logger from '../config/logger.js';
 
 /**
  * Service for managing timers business logic

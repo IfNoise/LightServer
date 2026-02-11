@@ -2,6 +2,7 @@
 import modbus from "jsmodbus";
 import net from "net";
 import { SerialPort } from "serialport";
+import logger from "../config/logger.js";
 
 class ModbusDevice {
   constructor(name, address, port, timeout = 1000, type = "rtu", baudRate = 9600, dataBits = 8, stopBits = 1, parity = "none", unitId = 1, portsCount = 8) {
@@ -68,16 +69,16 @@ class ModbusDevice {
       this.client = new modbus.client.RTU(this.serialPort, this.unitId);
       
       this.serialPort.on('open', () => {
-        console.log(`Serial port ${this.options.path} opened for ${this.name}`);
+        logger.info(`Serial port opened`, { device: this.name, path: this.options.path });
         // Для RTU не делаем автоматический опрос состояния
         // Состояние управляется только через команды записи
       });
       
       this.serialPort.on('error', (err) => {
-        console.error(`Serial port error for ${this.name}:`, err);
+        logger.error(`Serial port error`, { device: this.name, error: err.message });
       });
     } catch (e) {
-      console.error(`Failed to initialize RTU device ${this.name}:`, e);
+      logger.error(`Failed to initialize RTU device`, { device: this.name, error: e.message });
     }
   }
   requestState() {
@@ -102,18 +103,18 @@ class ModbusDevice {
                   socket.end();
                 })
                 .catch(function (error) {
-                  console.log(error);
+                  logger.error("Failed to read TCP holding registers", { error: error.message });
                   reject([]);
                   socket.end();
                 });
             });
             socket.connect(this.options);
           } catch (e) {
-            console.log(e);
+            logger.error("TCP requestState error", { device: this.name, error: e.message });
             reject([]);
           }
         }).catch((e) => {
-          console.log(e);
+          logger.error("TCP requestState catch error", { device: this.name, error: e.message });
           return [];
         });
       }
@@ -134,16 +135,16 @@ class ModbusDevice {
                 resolve([...this.ports]);
               })
               .catch((error) => {
-                console.log(error);
+                logger.error("Failed to read RTU holding registers", { device: this.name, error: error.message });
                 // При ошибке возвращаем текущее состояние
                 resolve([...this.ports]);
               });
           } catch (e) {
-            console.log(e);
+            logger.error("RTU requestState error", { device: this.name, error: e.message });
             resolve([...this.ports]);
           }
         }).catch((e) => {
-          console.log(e);
+          logger.error("RTU requestState catch error", { device: this.name, error: e.message });
           return [...this.ports];
         });
       } 
@@ -176,11 +177,11 @@ class ModbusDevice {
           });
           socket.connect(this.options);
         } catch (e) {
-          console.log(e);
+          logger.error("TCP updatePorts error", { device: this.name, error: e.message });
           reject([]);
         }
       }).catch((e) => {
-        console.log(e);
+        logger.error("TCP updatePorts catch error", { device: this.name, error: e.message });
         return [];
       });
   }
@@ -204,11 +205,11 @@ class ModbusDevice {
               reject([]);
             });
         } catch (e) {
-          console.log(e);
+          logger.error("RTU updatePorts error", { device: this.name, error: e.message });
           reject([]);
         }
       }).catch((e) => {
-        console.log(e);
+        logger.error("RTU updatePorts catch error", { device: this.name, error: e.message });
         return [];
       });
   }
@@ -223,37 +224,37 @@ class ModbusDevice {
   updatePortTCP(port, newState) {
       return new Promise((resolve, reject) => {
         try {
-          console.log(`[ModbusDevice:${this.name}] TCP updatePort: port=${port}, value=${newState}`);
+          logger.debug(`TCP updatePort`, { device: this.name, port, value: newState });
           const socket = new net.Socket();
           const client = new modbus.client.TCP(socket);
           
           socket.on("error", (err) => {
-            console.error(`[ModbusDevice:${this.name}] TCP socket error:`, err);
+            logger.error(`TCP socket error`, { device: this.name, error: err.message });
             reject(err);
           });
           
           socket.on("connect", () => {
-            console.log(`[ModbusDevice:${this.name}] TCP connected, writing register...`);
+            logger.debug(`TCP connected, writing register`, { device: this.name });
             client
               .writeSingleRegister(port, newState)
               .then((resp) => {
-                console.log(`[ModbusDevice:${this.name}] TCP write success:`, resp.response._body);
+                logger.debug(`TCP write success`, { device: this.name, response: resp.response._body });
                 resolve(resp.response._body);
                 socket.end();
               })
               .catch((err) => {
-                console.error(`[ModbusDevice:${this.name}] TCP write failed:`, err);
+                logger.error(`TCP write failed`, { device: this.name, error: err.message });
                 reject(err);
                 socket.end();
               });
           });
           socket.connect(this.options);
         } catch (e) {
-          console.error(`[ModbusDevice:${this.name}] TCP exception:`, e);
+          logger.error(`TCP exception`, { device: this.name, error: e.message });
           reject(e);
         }
       }).catch((e) => {
-        console.error(`[ModbusDevice:${this.name}] TCP updatePort final error:`, e);
+        logger.error(`TCP updatePort final error`, { device: this.name, error: e.message });
         throw e;
       });
     }
@@ -263,21 +264,21 @@ class ModbusDevice {
         try {
           if (!this.client) {
             const err = new Error("RTU client not initialized");
-            console.error(`[ModbusDevice:${this.name}]`, err.message);
+            logger.error("RTU client not initialized", { device: this.name });
             reject(err);
             return;
           }
           
           if (!this.serialPort) {
             const err = new Error("Serial port not initialized");
-            console.error(`[ModbusDevice:${this.name}]`, err.message);
+            logger.error("Serial port not initialized", { device: this.name });
             reject(err);
             return;
           }
           
           if (!this.serialPort.isOpen) {
             const err = new Error(`Serial port ${this.options.path} is not open`);
-            console.error(`[ModbusDevice:${this.name}]`, err.message);
+            logger.error("Serial port is not open", { device: this.name, path: this.options.path });
             reject(err);
             return;
           }
@@ -290,15 +291,15 @@ class ModbusDevice {
               resolve(resp.response._body);
             })
             .catch((err) => {
-              console.error(`[ModbusDevice:${this.name}] RTU write failed:`, err);
+              logger.error(`RTU write failed`, { device: this.name, error: err.message });
               reject(err);
             });
         } catch (e) {
-          console.error(`[ModbusDevice:${this.name}] RTU exception:`, e);
+          logger.error(`RTU exception`, { device: this.name, error: e.message });
           reject(e);
         }
       }).catch((e) => {
-        console.error(`[ModbusDevice:${this.name}] RTU updatePort final error:`, e);
+        logger.error(`RTU updatePort final error`, { device: this.name, error: e.message });
         throw e;
       });
     } 
@@ -331,12 +332,12 @@ class ModbusDevice {
         });
         socket.connect(this.options);
       } catch (e) {
-        console.log(e);
+        logger.error("TCP portState error", { device: this.name, error: e.message });
         reject([]);
       }
     })
     .catch((e) => {
-      console.log(e);
+      logger.error("TCP portState catch error", { device: this.name, error: e.message });
       return [];
     });
   }
@@ -371,12 +372,12 @@ class ModbusDevice {
             }
           });
       } catch (e) {
-        console.log(e);
+        logger.error("RTU portState error", { device: this.name, error: e.message });
         resolve([0]);
       }
     })
     .catch((e) => {
-      console.log(e);
+      logger.error("RTU portState catch error", { device: this.name, error: e.message });
       return [];
     });
   }

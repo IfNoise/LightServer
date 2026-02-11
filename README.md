@@ -32,6 +32,38 @@ cp .env.example .env
 | `STORAGE_DEVICES` | Путь к хранилищу устройств | `./storage/devices` |
 | `STORAGE_CHANNELS` | Путь к хранилищу каналов | `./storage/channels` |
 | `STORAGE_TIMERS` | Путь к хранилищу таймеров | `./storage/timers` |
+| `LOG_LEVEL` | Уровень логирования (error, warn, info, debug) | `info` |
+| `LOKI_HOST` | URL Grafana Loki для отправки логов (опционально) | - |
+
+### Логирование
+
+Приложение использует Winston для логирования с поддержкой Grafana Loki.
+
+**Уровни логирования:**
+- `error` - только ошибки
+- `warn` - предупреждения и ошибки
+- `info` - информационные сообщения (по умолчанию)
+- `debug` - подробные логи для отладки
+
+**Транспорты:**
+- Console - вывод в консоль (всегда включен)
+- File - файлы `logs/error.log` и `logs/combined.log` (только в production)
+- Loki - отправка в Grafana Loki (если указан `LOKI_HOST`)
+
+**Пример настройки Loki:**
+```env
+LOKI_HOST=http://localhost:3100
+LOG_LEVEL=debug
+```
+
+**Использование в коде:**
+```javascript
+import logger from './config/logger.js';
+
+logger.info('Server started', { port: 3000 });
+logger.error('Connection failed', { error: err.message });
+logger.debug('Processing request', { requestId: '123' });
+```
 
 ## Запуск
 

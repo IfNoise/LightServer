@@ -1,5 +1,6 @@
 import { Timer, TIMER_STATES } from "./Timer.js";
 import { LocalStorage } from "node-localstorage";
+import logger from "../config/logger.js";
 
 const removeElement = (array, element) => {
   let index = array.indexOf(element);
@@ -49,7 +50,7 @@ class TimerManager {
         });
 
         newTimer.on("error", (error) => {
-          console.error(`Timer ${timer.name} error:`, error);
+          logger.error(`Timer error`, { timer: timer.name, error: error.message });
         });
 
         if (timer.state === TIMER_STATES.STARTED) {
@@ -65,7 +66,7 @@ class TimerManager {
         }
       });
     } catch (e) {
-      console.error("Error loading timers:", e);
+      logger.error("Error loading timers", { error: e.message });
     }
   }
 
@@ -110,19 +111,19 @@ class TimerManager {
       
       // Подписываемся на события таймера
       timer.on("stateUpdate", async ({ brightness, channels }) => {
-        console.log(`Timer ${name} stateUpdate: brightness=${brightness}, channels count=${channels.length}`);
+        logger.debug(`Timer state update`, { timer: name, brightness, channelsCount: channels.length });
         const results = await Promise.all(
           channels.map(async (channel) => {
             const result = await channel.setPersentage(brightness);
-            console.log(`  Channel ${channel.name} update result:`, result);
+            logger.debug(`Channel updated`, { timer: name, channel: channel.name, result });
             return result;
           })
         );
-        console.log(`Timer ${name} update completed`);
+        logger.debug(`Timer update completed`, { timer: name });
       });
 
       timer.on("error", (error) => {
-        console.error(`Timer ${name} error:`, error);
+        logger.error(`Timer error`, { timer: name, error: error.message });
       });
       
       timer.init();
@@ -130,7 +131,7 @@ class TimerManager {
       this.saveTimers();
       return { status: "ok" };
     } catch (e) {
-      console.log(e.message);
+      logger.error("Failed to add timer", { error: e.message });
       return { status: "error", message: e.message };
     }
   }
@@ -150,7 +151,7 @@ class TimerManager {
       this.saveTimers();
       return { status: "ok" };
     } catch (e) {
-      console.error(e);
+      logger.error("Failed to remove timer", { timer: timerName, error: e.message });
       return { status: "error", message: e.message };
     }
   }
@@ -180,7 +181,7 @@ class TimerManager {
       this.saveTimers();
       return { status: "ok" };
     } catch (e) {
-      console.error(e);
+      logger.error("Failed to subscribe channels to timer", { timer: timerName, error: e.message });
       return { status: "error", message: e.message };
     }
   }
@@ -205,7 +206,7 @@ class TimerManager {
       this.saveTimers();
       return { status: "ok" };
     } catch (e) {
-      console.error(e);
+      logger.error("Failed to unsubscribe channels from timer", { timer: timerName, error: e.message });
       return { status: "error", message: e.message };
     }
   }

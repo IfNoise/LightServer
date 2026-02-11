@@ -10,6 +10,7 @@ import TimerManager from "./models/TimerManager.js";
 import ChannelsManager from "./models/ChannelsManager.js";
 import bodyParser from "body-parser";
 import apiRouter from "./routes/index.js";
+import logger from "./config/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -51,19 +52,19 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(modifiedSwaggerDoc, {
 app.use("/api", apiRouter);
 
 const server = app.listen(port, () => {
-  console.log(`Server app listening at ${port} port`);
+  logger.info(`Server app listening at ${port} port`, { port });
 });
 
 const gracefulShutdown = (signal) => {
-  console.log(`Received ${signal}. Shutting down gracefully...`);
+  logger.info(`Received ${signal}. Shutting down gracefully...`, { signal });
   server.close(() => {
-    console.log("Closed out remaining connections.");
+    logger.info("Closed out remaining connections.");
     process.exit(0);
   });
 
   // Если через 10 секунд сервер не завершился, принудительно завершить процесс
   setTimeout(() => {
-    console.error("Could not close connections in time, forcefully shutting down");
+    logger.error("Could not close connections in time, forcefully shutting down");
     process.exit(1);
   }, 10000);
 };

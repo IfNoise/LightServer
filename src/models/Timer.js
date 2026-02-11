@@ -1,5 +1,6 @@
 import { LocalStorage } from "node-localstorage";
 import EventEmitter from "events";
+import logger from "../config/logger.js";
 
 // Constants
 const TIMER_STATES = {
@@ -253,17 +254,17 @@ class Timer extends EventEmitter {
 
   start() {
     if (this.#state === TIMER_STATES.STARTED) {
-      console.log(`[Timer:${this.name}] Already started, skipping`);
+      logger.debug(`Timer already started, skipping`, { timer: this.name });
       return;
     }
 
-    console.log(`[Timer:${this.name}] Starting timer with interval ${CONSTANTS.TIMER_INTERVAL}ms`);
+    logger.info(`Starting timer`, { timer: this.name, interval: CONSTANTS.TIMER_INTERVAL });
     
     this.timer = setInterval(() => {
       try {
         this.#updateState();
       } catch (error) {
-        console.error(`[Timer:${this.name}] Error in updateState:`, error);
+        logger.error(`Error in timer updateState`, { timer: this.name, error: error.message });
         this.emit("error", error);
       }
     }, CONSTANTS.TIMER_INTERVAL);
@@ -271,7 +272,7 @@ class Timer extends EventEmitter {
     this.#state = TIMER_STATES.STARTED;
     this.#saveToStorage("state", this.#state);
     
-    console.log(`[Timer:${this.name}] Timer started successfully`);
+    logger.info(`Timer started successfully`, { timer: this.name });
     this.emit("started");
   }
 

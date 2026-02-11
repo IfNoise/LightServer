@@ -1,4 +1,5 @@
 import { LocalStorage } from "node-localstorage";
+import logger from "../config/logger.js";
 
 class LightChannel {
   constructor(name, device, port) {
@@ -28,7 +29,7 @@ class LightChannel {
       this.device = device;
       return { status: "ok" };
     } catch (e) {
-      console.error(e);
+      logger.error("Failed to set device for channel", { channel: this.name, error: e.message });
       return { status: "error", message: e.message };
     }
   }
@@ -41,7 +42,7 @@ class LightChannel {
       this.localStorage.setItem("port", port);
       return { status: "ok" };
     } catch (e) {
-      console.error(e);
+      logger.error("Failed to set port for channel", { channel: this.name, error: e.message });
       return { status: "error", message: e.message };
     }
   }
@@ -61,7 +62,7 @@ class LightChannel {
       this.minLevel = Math.round(minLevel);
       this.localStorage.setItem("minLevel", this.minLevel);
       
-      console.log(`MinLevel changed from ${oldMinLevel} to ${this.minLevel} for channel ${this.name}`);
+      logger.debug(`MinLevel changed for channel`, { channel: this.name, oldMinLevel, newMinLevel: this.minLevel });
       
       // Пересчитываем и обновляем уровень на устройстве
       if (this.currentPercentage !== undefined) {
@@ -69,7 +70,7 @@ class LightChannel {
       }
       return { status: "ok" };
     } catch (e) {
-      console.error(e);
+      logger.error("Failed to set minLevel for channel", { channel: this.name, error: e.message });
       return { status: "error", message: e.message };
     }
   }
@@ -83,7 +84,7 @@ class LightChannel {
       this.maxLevel = Math.round(maxLevel);
       this.localStorage.setItem("maxLevel", this.maxLevel);
       
-      console.log(`MaxLevel changed from ${oldMaxLevel} to ${this.maxLevel} for channel ${this.name}`);
+      logger.debug(`MaxLevel changed for channel`, { channel: this.name, oldMaxLevel, newMaxLevel: this.maxLevel });
       
       // Пересчитываем и обновляем уровень на устройстве
       if (this.currentPercentage !== undefined) {
@@ -93,7 +94,7 @@ class LightChannel {
       }
       return { status: "ok" };
     } catch (e) {
-      console.error(e);
+      logger.error("Failed to set maxLevel for channel", { channel: this.name, error: e.message });
       return { status: "error", message: e.message };
     }
   }
@@ -111,7 +112,7 @@ class LightChannel {
       }
       
       if (this.maxLevel === 0) {
-        console.warn(`[WARNING] Channel ${this.name} has maxLevel=0! Cannot calculate brightness.`);
+        logger.warn(`Channel has maxLevel=0, cannot calculate brightness`, { channel: this.name });
         return { status: "error", message: "maxLevel is 0, cannot set brightness" };
       }
       
@@ -137,7 +138,7 @@ class LightChannel {
       
       return { status: "ok" };
     } catch (e) {
-      console.error(`Channel ${this.name} setPersentage error:`, e);
+      logger.error(`Channel setPersentage error`, { channel: this.name, error: e.message });
       return { status: "error", message: e.message };
     }
   }
@@ -160,7 +161,7 @@ class LightChannel {
       const ports = await this.device.requestState();
       return ports[this.port];
     } catch (e) {
-      console.error(e);
+      logger.error("Failed to get channel state", { channel: this.name, error: e.message });
       return { status: "error", message: e.message };
     }
   }

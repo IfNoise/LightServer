@@ -1,5 +1,6 @@
 import { LocalStorage } from "node-localstorage";
 import LightChannel from "./LightChannel.js";
+import logger from "../config/logger.js";
 
 class ChannelsManager {
   static instance = null;
@@ -67,7 +68,7 @@ class ChannelsManager {
       this.saveChannels();
       return { status: "ok" };
     } catch (e) {
-      console.log(e);
+      logger.error("Failed to add channel", { channel: channel.name, error: e.message });
       return { status: "error", message: e.message };
     }
   }
@@ -81,7 +82,7 @@ class ChannelsManager {
       this.saveChannels();
       return { status: "ok" };
     } catch (e) {
-      console.log(e);
+      logger.error("Failed to remove channel", { channel: name, error: e.message });
       return { status: "error", message: e.message };
     }
   }
