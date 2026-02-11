@@ -67,7 +67,14 @@ class LightChannel extends EventEmitter {
       }
       const oldMinLevel = this.minLevel;
       // Округляем до целого числа для Modbus регистров
-      this.minLevel = Math.round(minLevel);
+      const newMinLevel = Math.round(minLevel);
+      
+      // Проверяем изменилось ли значение
+      if (newMinLevel === this.minLevel) {
+        return { status: "ok", message: "Min level unchanged" };
+      }
+      
+      this.minLevel = newMinLevel;
       this.localStorage.setItem("minLevel", this.minLevel);
 
       logger.debug(`MinLevel changed for channel`, {
@@ -79,10 +86,10 @@ class LightChannel extends EventEmitter {
       // Пересчитываем и обновляем уровень на устройстве
       if (this.currentPercentage !== undefined) {
         await this.setPersentage(this.currentPercentage);
+      } else {
+        // Если процент не установлен, все равно эмитим изменение
+        this.emitStateChanged();
       }
-
-      // Эмитим событие изменения состояния
-      this.emitStateChanged();
 
       return { status: "ok" };
     } catch (e) {
@@ -100,7 +107,14 @@ class LightChannel extends EventEmitter {
       }
       const oldMaxLevel = this.maxLevel;
       // Округляем до целого числа для Modbus регистров
-      this.maxLevel = Math.round(maxLevel);
+      const newMaxLevel = Math.round(maxLevel);
+      
+      // Проверяем изменилось ли значение
+      if (newMaxLevel === this.maxLevel) {
+        return { status: "ok", message: "Max level unchanged" };
+      }
+      
+      this.maxLevel = newMaxLevel;
       this.localStorage.setItem("maxLevel", this.maxLevel);
 
       logger.debug(`MaxLevel changed for channel`, {
@@ -114,10 +128,10 @@ class LightChannel extends EventEmitter {
         await this.setPersentage(this.currentPercentage);
       } else if (this.manual) {
         await this.setPersentage(100);
+      } else {
+        // Если процент не установлен и не ручной режим, все равно эмитим изменение
+        this.emitStateChanged();
       }
-
-      // Эмитим событие изменения состояния
-      this.emitStateChanged();
 
       return { status: "ok" };
     } catch (e) {
@@ -165,15 +179,24 @@ class LightChannel extends EventEmitter {
           this.minLevel + ((this.maxLevel - this.minLevel) * persentage) / 100;
       }
 
-      // Всегда обновляем устройство, даже если level не изменился
-      // (реальное состояние устройства могло быть изменено извне)
       // Округляем level до целого числа
-      this.level = Math.round(newLevel);
+      const roundedLevel = Math.round(newLevel);
+      
+      // Проверяем изменился ли уровень или процент
+      const levelChanged = roundedLevel !== this.level;
+      const percentageChanged = this.currentPercentage !== persentage;
+      
+      this.level = roundedLevel;
 
-      const res = await this.device.updatePort(this.port, this.level);
+      // Обновляем устройство только если что-то изменилось
+      if (levelChanged) {
+        await this.device.updatePort(this.port, this.level);
+      }
 
-      // Эмитим событие изменения состояния
-      this.emitStateChanged();
+      // Эмитим событие изменения состояния только если что-то изменилось
+      if (levelChanged || percentageChanged) {
+        this.emitStateChanged();
+      }
 
       return { status: "ok" };
     } catch (e) {
