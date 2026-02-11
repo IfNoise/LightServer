@@ -22,7 +22,7 @@ class WebSocketService {
    * @param {number} port - Порт для запуска WebSocket сервера (опционально)
    */
   init(server, port = null) {
-    this.wss = new WebSocketServer({ server, path: "/ws/channels" });
+    this.wss = new WebSocketServer({ server });
     this.server = server;
 
     // Если передан порт, запускаем HTTP сервер
