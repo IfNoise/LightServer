@@ -41,21 +41,24 @@ class ChannelService {
    * Update channel partially
    * @param {string} name - Channel name
    * @param {Object} updateData - Data to update
-   * @returns {Object} Result with status
+   * @returns {Promise<Object>} Result with status
    */
-  updateChannel(name, updateData) {
+  async updateChannel(name, updateData) {
     const channel = this.channelManager.getChannel(name);
     if (!channel) {
       return { status: "error", message: "Channel not found" };
     }
     
-    const { maxLevel, port } = updateData;
+    const { maxLevel, minLevel, port } = updateData;
     
     if (maxLevel !== undefined) {
-      channel.maxLevel = maxLevel;
+      await channel.setMaxLevel(maxLevel);
+    }
+    if (minLevel !== undefined) {
+      await channel.setMinLevel(minLevel);
     }
     if (port !== undefined) {
-      channel.port = port;
+      channel.setPort(port);
     }
     
     this.channelManager.saveChannels();
@@ -66,24 +69,29 @@ class ChannelService {
    * Replace channel completely
    * @param {string} name - Channel name
    * @param {Object} channelData - New channel data
-   * @returns {Object} Result with status
+   * @returns {Promise<Object>} Result with status
    */
-  replaceChannel(name, channelData) {
+  async replaceChannel(name, channelData) {
     const channel = this.channelManager.getChannel(name);
     if (!channel) {
       return { status: "error", message: "Channel not found" };
     }
     
-    const { device, port, maxLevel } = channelData;
+    const { device, port, maxLevel, minLevel } = channelData;
     
     // Remove and recreate channel
     this.channelManager.removeChannel(name);
     const result = this.channelManager.addChannel({ name, device, port });
     
-    if (result.status === "ok" && maxLevel !== undefined) {
+    if (result.status === "ok") {
       const newChannel = this.channelManager.getChannel(name);
       if (newChannel) {
-        newChannel.maxLevel = maxLevel;
+        if (maxLevel !== undefined) {
+          await newChannel.setMaxLevel(maxLevel);
+        }
+        if (minLevel !== undefined) {
+          await newChannel.setMinLevel(minLevel);
+        }
         this.channelManager.saveChannels();
       }
     }

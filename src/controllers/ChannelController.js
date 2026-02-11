@@ -77,10 +77,10 @@ class ChannelController {
    * @param {Object} req - Express request
    * @param {Object} res - Express response
    */
-  static updateChannel(req, res) {
+  static async updateChannel(req, res) {
     try {
       const { name } = req.params;
-      const result = channelService.updateChannel(name, req.body);
+      const result = await channelService.updateChannel(name, req.body);
       
       if (result.status === "error") {
         return res.status(404).json(result);
@@ -97,10 +97,10 @@ class ChannelController {
    * @param {Object} req - Express request
    * @param {Object} res - Express response
    */
-  static replaceChannel(req, res) {
+  static async replaceChannel(req, res) {
     try {
       const { name } = req.params;
-      const { device, port, maxLevel } = req.body;
+      const { device, port, maxLevel, minLevel } = req.body;
       
       // Validate required fields
       if (!device) {
@@ -110,7 +110,7 @@ class ChannelController {
         return res.status(400).json({ status: "error", message: "Port number is required" });
       }
       
-      const result = channelService.replaceChannel(name, { device, port, maxLevel });
+      const result = await channelService.replaceChannel(name, { device, port, maxLevel, minLevel });
       
       if (result.status === "ok") {
         res.json(result);
