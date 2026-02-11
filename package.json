@@ -2,6 +2,7 @@
   "name": "light-server",
   "version": "1.0.0",
   "description": "react-express-modbus",
+  "type": "module",
   "main": "app.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node app.js",

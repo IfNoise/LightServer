@@ -1,5 +1,5 @@
-const request = require('supertest');
-const express = require('express');
+import request from 'supertest';
+import express from 'express';
 
 // Set environment variables
 process.env.PORT = '3000';
@@ -16,15 +16,19 @@ const mockTimerManager = {
   unsubscribe: jest.fn(),
 };
 
-jest.mock('../models/ChannelsManager', () => ({
-  getInstance: jest.fn(() => ({}))
+jest.mock('../models/ChannelsManager.js', () => ({
+  default: {
+    getInstance: jest.fn(() => ({}))
+  }
 }));
 
-jest.mock('../models/TimerManager', () => ({
-  getInstance: jest.fn(() => mockTimerManager)
+jest.mock('../models/TimerManager.js', () => ({
+  default: {
+    getInstance: jest.fn(() => mockTimerManager)
+  }
 }));
 
-const timersRoute = require('../routes/timers.route');
+import timersRoute from '../routes/timers.route.js';
 
 describe('Timers API', () => {
   let app;

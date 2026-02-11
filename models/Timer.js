@@ -1,5 +1,5 @@
-const { LocalStorage } = require("node-localstorage");
-const EventEmitter = require("events");
+import { LocalStorage } from "node-localstorage";
+import EventEmitter from "events";
 
 // Constants
 const TIMER_STATES = {
@@ -291,4 +291,5 @@ class Timer extends EventEmitter {
   }
 }
 
-module.exports = { Timer, TIMER_STATES, DAY_PERIODS, CONSTANTS };
+export { Timer, TIMER_STATES, DAY_PERIODS, CONSTANTS };
+export default Timer;

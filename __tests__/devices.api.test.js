@@ -1,5 +1,5 @@
-const request = require('supertest');
-const express = require('express');
+import request from 'supertest';
+import express from 'express';
 
 // Set environment variables FIRST
 process.env.PORT = '3000';
@@ -16,11 +16,13 @@ const mockDeviceManager = {
   saveDevices: jest.fn(),
 };
 
-jest.mock('../models/DeviceManager', () => ({
-  getInstance: jest.fn(() => mockDeviceManager)
+jest.mock('../models/DeviceManager.js', () => ({
+  default: {
+    getInstance: jest.fn(() => mockDeviceManager)
+  }
 }));
 
-const devicesRoute = require('../routes/devices.route');
+import devicesRoute from '../routes/devices.route.js';
 
 describe('Devices API', () => {
   let app;

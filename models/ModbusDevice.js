@@ -1,7 +1,7 @@
 // Description: ModbusDevice model to interact with modbus devices.
-const modbus = require("jsmodbus");
-const net = require("net");
-const { SerialPort } = require("serialport");
+import modbus from "jsmodbus";
+import net from "net";
+import { SerialPort } from "serialport";
 
 class ModbusDevice {
   constructor(name, address, port, timeout = 1000, type = "rtu", baudRate = 9600, dataBits = 8, stopBits = 1, parity = "none", unitId = 1, portsCount = 8) {
@@ -383,4 +383,4 @@ class ModbusDevice {
 }
 
 
-module.exports = ModbusDevice;
+export default ModbusDevice;

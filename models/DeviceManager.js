@@ -1,5 +1,5 @@
-const LocalStorage = require('node-localstorage').LocalStorage;
-const ModbusDevice = require('./ModbusDevice');
+import { LocalStorage } from 'node-localstorage';
+import ModbusDevice from './ModbusDevice.js';
 
 class DeviceManager {
   static instance = null;
@@ -95,4 +95,4 @@ class DeviceManager {
   }
 
 }
-module.exports = DeviceManager;
+export default DeviceManager;

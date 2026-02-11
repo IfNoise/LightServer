@@ -1,5 +1,5 @@
-const LocalStorage = require("node-localstorage").LocalStorage;
-const LightChannel = require("./LightChannel");
+import { LocalStorage } from "node-localstorage";
+import LightChannel from "./LightChannel.js";
 
 class ChannelsManager {
   static instance = null;
@@ -122,4 +122,4 @@ class ChannelsManager {
   }
 }
 
-module.exports = ChannelsManager;
+export default ChannelsManager;

@@ -1,4 +1,4 @@
-const LocalStorage = require("node-localstorage").LocalStorage;
+import { LocalStorage } from "node-localstorage";
 
 class LightChannel {
   constructor(name, device, port) {
@@ -166,4 +166,4 @@ class LightChannel {
   }
 }
 
-module.exports = LightChannel;
+export default LightChannel;

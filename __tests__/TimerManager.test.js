@@ -1,6 +1,6 @@
-const TimerManager = require('../models/TimerManager');
-const { Timer } = require('../models/Timer');
-const LocalStorage = require('node-localstorage').LocalStorage;
+import TimerManager from '../models/TimerManager.js';
+import { Timer } from '../models/Timer.js';
+import { LocalStorage } from 'node-localstorage';
 
 // Mock dependencies
 jest.mock('node-localstorage');

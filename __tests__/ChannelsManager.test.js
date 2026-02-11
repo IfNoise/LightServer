@@ -1,6 +1,6 @@
-const ChannelsManager = require('../models/ChannelsManager');
-const LightChannel = require('../models/LightChannel');
-const LocalStorage = require('node-localstorage').LocalStorage;
+import ChannelsManager from '../models/ChannelsManager.js';
+import LightChannel from '../models/LightChannel.js';
+import { LocalStorage } from 'node-localstorage';
 
 // Mock dependencies
 jest.mock('node-localstorage');

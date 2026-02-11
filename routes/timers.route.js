@@ -1,7 +1,8 @@
-const {Router}= require('express');
+import { Router } from 'express';
+import ChannelsManager from '../models/ChannelsManager.js';
+import TimerManager from '../models/TimerManager.js';
+
 const router = Router();
-const ChannelsManager = require('../models/ChannelsManager');
-const TimerManager = require('../models/TimerManager');
 
 const cannalsManager = ChannelsManager.getInstance();
 const timerManager = TimerManager.getInstance(cannalsManager);
@@ -204,5 +205,5 @@ router.post("/:name/stop", (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
 

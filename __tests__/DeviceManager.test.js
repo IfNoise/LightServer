@@ -1,6 +1,6 @@
-const DeviceManager = require('../models/DeviceManager');
-const ModbusDevice = require('../models/ModbusDevice');
-const LocalStorage = require('node-localstorage').LocalStorage;
+import DeviceManager from '../models/DeviceManager.js';
+import ModbusDevice from '../models/ModbusDevice.js';
+import { LocalStorage } from 'node-localstorage';
 
 // Mock dependencies
 jest.mock('node-localstorage');

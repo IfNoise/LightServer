@@ -1,6 +1,5 @@
-const { Timer } = require("./Timer");
-const { TIMER_STATES } = require("./Timer");
-const LocalStorage = require("node-localstorage").LocalStorage;
+import { Timer, TIMER_STATES } from "./Timer.js";
+import { LocalStorage } from "node-localstorage";
 
 const removeElement = (array, element) => {
   let index = array.indexOf(element);
@@ -212,4 +211,4 @@ class TimerManager {
   }
 }
 
-module.exports = TimerManager;
+export default TimerManager;

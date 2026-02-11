@@ -1,7 +1,8 @@
-const { Router } = require("express");
+import { Router } from "express";
+import DeviceManager from "../models/DeviceManager.js";
+import ChannelsManager from "../models/ChannelsManager.js";
+
 const router = Router();
-const DeviceManager = require("../models/DeviceManager");
-const ChannelsManager = require("../models/ChannelsManager");
 
 const deviceManager = DeviceManager.getInstance();
 const channelManager = ChannelsManager.getInstance(deviceManager);
@@ -188,4 +189,4 @@ router.post("/:name/setDevice", (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

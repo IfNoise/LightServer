@@ -1,5 +1,5 @@
-const request = require('supertest');
-const express = require('express');
+import request from 'supertest';
+import express from 'express';
 
 // Set environment variables
 process.env.PORT = '3000';
@@ -16,15 +16,19 @@ const mockChannelsManager = {
   channels: [],
 };
 
-jest.mock('../models/DeviceManager', () => ({
-  getInstance: jest.fn(() => ({}))
+jest.mock('../models/DeviceManager.js', () => ({
+  default: {
+    getInstance: jest.fn(() => ({}))
+  }
 }));
 
-jest.mock('../models/ChannelsManager', () => ({
-  getInstance: jest.fn(() => mockChannelsManager)
+jest.mock('../models/ChannelsManager.js', () => ({
+  default: {
+    getInstance: jest.fn(() => mockChannelsManager)
+  }
 }));
 
-const lightChannelsRoute = require('../routes/lightChannels.route');
+import lightChannelsRoute from '../routes/lightChannels.route.js';
 
 describe('LightChannels API', () => {
   let app;

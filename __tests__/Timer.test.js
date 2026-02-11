@@ -1,4 +1,4 @@
-const { Timer, TIMER_STATES, DAY_PERIODS, CONSTANTS } = require('../models/Timer');
+import { Timer, TIMER_STATES, DAY_PERIODS, CONSTANTS } from '../models/Timer.js';
 
 // Mock localStorage
 jest.mock('node-localstorage', () => {

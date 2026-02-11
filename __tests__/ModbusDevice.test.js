@@ -1,4 +1,4 @@
-const ModbusDevice = require('../models/ModbusDevice');
+import ModbusDevice from '../models/ModbusDevice.js';
 
 // Mock dependencies
 jest.mock('net');

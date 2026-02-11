@@ -1,6 +1,7 @@
-const {Router}= require('express');
+import { Router } from 'express';
+import DeviceManager from '../models/DeviceManager.js';
+
 const router = Router();
-const DeviceManager = require('../models/DeviceManager');
 
 const deviceManager = DeviceManager.getInstance();
 
@@ -212,6 +213,6 @@ router.post("/add", (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
 
 

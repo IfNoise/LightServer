@@ -1,25 +1,28 @@
-require('dotenv').config();
-const express = require("express");
-const {Router}= require('express');
-const router=Router();
-const cors = require("cors");
+import 'dotenv/config';
+import express, { Router } from "express";
+import cors from "cors";
+import swaggerUi from "swagger-ui-express";
+import { readFileSync } from 'fs';
+import DeviceManager from "./models/DeviceManager.js";
+import TimerManager from "./models/TimerManager.js";
+import ChannelsManager from "./models/ChannelsManager.js";
+import bodyParser from "body-parser";
+import devicesRouter from "./routes/devices.route.js";
+import timersRouter from "./routes/timers.route.js";
+import lightChannelsRouter from "./routes/lightChannels.route.js";
+
+const swaggerDocument = JSON.parse(readFileSync('./swagger.json', 'utf-8'));
+
 const port = process.env.PORT || 3000;
-const path = require("path");
-const swaggerUi = require("swagger-ui-express");
-const swaggerDocument = require("./swagger.json");
-const DeviceManager = require("./models/DeviceManager");
-const TimerManager = require("./models/TimerManager");
-const ChannelsManager = require("./models/ChannelsManager");
-const bodyParser = require("body-parser");
 //=========================================================
 const app = express();
 const deviceManager = DeviceManager.getInstance();
 deviceManager.init();
 
-let channelManager = ChannelsManager.getInstance(deviceManager);
+const channelManager = ChannelsManager.getInstance(deviceManager);
 channelManager.init();
 
-let timerManager = TimerManager.getInstance(channelManager);
+const timerManager = TimerManager.getInstance(channelManager);
 timerManager.init();
 
 
@@ -43,12 +46,14 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(modifiedSwaggerDoc, {
   customCss: '.swagger-ui .topbar { display: none }'
 }));
 
-app.use("/api/devices", require("./routes/devices.route"));
-app.use("/api/timers", require("./routes/timers.route"));
-app.use("/api/lightChannels", require("./routes/lightChannels.route"));
-app.listen(port, () => {
+app.use("/api/devices", devicesRouter);
+app.use("/api/timers", timersRouter);
+app.use("/api/lightChannels", lightChannelsRouter);
+
+const server = app.listen(port, () => {
   console.log(`Server app listening at ${port} port`);
-})
+});
+
 const gracefulShutdown = (signal) => {
   console.log(`Received ${signal}. Shutting down gracefully...`);
   server.close(() => {
@@ -65,5 +70,6 @@ const gracefulShutdown = (signal) => {
 
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+
 
 
