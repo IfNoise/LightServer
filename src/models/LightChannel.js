@@ -68,12 +68,12 @@ class LightChannel extends EventEmitter {
       const oldMinLevel = this.minLevel;
       // Округляем до целого числа для Modbus регистров
       const newMinLevel = Math.round(minLevel);
-      
+
       // Проверяем изменилось ли значение
       if (newMinLevel === this.minLevel) {
         return { status: "ok", message: "Min level unchanged" };
       }
-      
+
       this.minLevel = newMinLevel;
       this.localStorage.setItem("minLevel", this.minLevel);
 
@@ -108,12 +108,12 @@ class LightChannel extends EventEmitter {
       const oldMaxLevel = this.maxLevel;
       // Округляем до целого числа для Modbus регистров
       const newMaxLevel = Math.round(maxLevel);
-      
+
       // Проверяем изменилось ли значение
       if (newMaxLevel === this.maxLevel) {
         return { status: "ok", message: "Max level unchanged" };
       }
-      
+
       this.maxLevel = newMaxLevel;
       this.localStorage.setItem("maxLevel", this.maxLevel);
 
@@ -165,6 +165,10 @@ class LightChannel extends EventEmitter {
         };
       }
 
+      // Сохраняем старые значения для проверки изменений
+      const oldPercentage = this.currentPercentage;
+      const oldLevel = this.level;
+
       // Сохраняем текущий процент для пересчета при изменении maxLevel
       this.currentPercentage = persentage;
 
@@ -181,17 +185,15 @@ class LightChannel extends EventEmitter {
 
       // Округляем level до целого числа
       const roundedLevel = Math.round(newLevel);
-      
+
       // Проверяем изменился ли уровень или процент
-      const levelChanged = roundedLevel !== this.level;
-      const percentageChanged = this.currentPercentage !== persentage;
-      
+      const levelChanged = roundedLevel !== oldLevel;
+      const percentageChanged = persentage !== oldPercentage;
+
       this.level = roundedLevel;
 
-      // Обновляем устройство только если что-то изменилось
-      if (levelChanged) {
-        await this.device.updatePort(this.port, this.level);
-      }
+      // Всегда обновляем устройство (состояние могло быть изменено извне)
+      await this.device.updatePort(this.port, this.level);
 
       // Эмитим событие изменения состояния только если что-то изменилось
       if (levelChanged || percentageChanged) {
