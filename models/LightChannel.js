@@ -6,6 +6,7 @@ class LightChannel {
     this.device = device;
     this.port = port;
     this.maxLevel = 0;
+    this.minLevel = 0; // Минимальный уровень регулирования (для нечувствительных светильников)
     this.level = 0;
     this.manual = true;
     //this.nightMode=true;
@@ -14,6 +15,7 @@ class LightChannel {
   }
   init() {
     this.maxLevel = parseInt(this.localStorage.getItem("maxLevel")) || 0;
+    this.minLevel = parseInt(this.localStorage.getItem("minLevel")) || 0;
     // currentPercentage остается undefined, пока не будет явно установлен
   }
   setDevice(device) {
@@ -37,6 +39,34 @@ class LightChannel {
       }
       this.port = port;
       this.localStorage.setItem("port", port);
+      return { status: "ok" };
+    } catch (e) {
+      console.error(e);
+      return { status: "error", message: e.message };
+    }
+  }
+  async setMinLevel(minLevel) {
+    try {
+      if (Number.isNaN(minLevel)) {
+        throw new Error("Min level must be a number");
+      }
+      if (minLevel < 0) {
+        throw new Error("Min level must be non-negative");
+      }
+      if (minLevel > this.maxLevel) {
+        throw new Error("Min level cannot be greater than max level");
+      }
+      const oldMinLevel = this.minLevel;
+      // Округляем до целого числа для Modbus регистров
+      this.minLevel = Math.round(minLevel);
+      this.localStorage.setItem("minLevel", this.minLevel);
+      
+      console.log(`MinLevel changed from ${oldMinLevel} to ${this.minLevel} for channel ${this.name}`);
+      
+      // Пересчитываем и обновляем уровень на устройстве
+      if (this.currentPercentage !== undefined) {
+        await this.setPersentage(this.currentPercentage);
+      }
       return { status: "ok" };
     } catch (e) {
       console.error(e);
@@ -88,8 +118,15 @@ class LightChannel {
       // Сохраняем текущий процент для пересчета при изменении maxLevel
       this.currentPercentage = persentage;
       
-      const newLevel =
-        persentage === 0 ? 0 : Math.floor((this.maxLevel * persentage) / 100);
+      let newLevel;
+      if (persentage === 0) {
+        // Полностью выключено
+        newLevel = 0;
+      } else {
+        // Масштабируем от minLevel до maxLevel
+        // При percentage=1 получим minLevel, при percentage=100 получим maxLevel
+        newLevel = this.minLevel + ((this.maxLevel - this.minLevel) * persentage) / 100;
+      }
       
       // Всегда обновляем устройство, даже если level не изменился
       // (реальное состояние устройства могло быть изменено извне)
@@ -111,6 +148,7 @@ class LightChannel {
       device: this.device?.name || "",
       port: this.port,
       maxLevel: this.maxLevel,
+      minLevel: this.minLevel,
       manual: this.manual,
     };
   }

@@ -5,6 +5,8 @@ const router=Router();
 const cors = require("cors");
 const port = process.env.PORT || 3000;
 const path = require("path");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
 const DeviceManager = require("./models/DeviceManager");
 const TimerManager = require("./models/TimerManager");
 const ChannelsManager = require("./models/ChannelsManager");
@@ -25,7 +27,21 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json({ extended: true }));
 
+// Swagger API Documentation
+const modifiedSwaggerDoc = {
+  ...swaggerDocument,
+  servers: [
+    {
+      url: `${process.env.API_BASE_URL || "http://localhost:" + port}${process.env.API_BASE_PATH || "/api"}`,
+      description: "LightServer API"
+    },
+  ],
+};
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(modifiedSwaggerDoc, {
+  customSiteTitle: "LightServer API Documentation",
+  customCss: '.swagger-ui .topbar { display: none }'
+}));
 
 app.use("/api/devices", require("./routes/devices.route"));
 app.use("/api/timers", require("./routes/timers.route"));

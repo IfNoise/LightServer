@@ -1,0 +1,998 @@
+openapi: 3.0.3
+info:
+  title: LightServer API
+  description: API для управления устройствами освещения через Modbus, световыми каналами и таймерами
+  version: 1.0.0
+  contact:
+    name: LightServer
+    
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+
+tags:
+  - name: Devices
+    description: Управление Modbus устройствами (TCP/RTU)
+  - name: Light Channels
+    description: Управление световыми каналами
+  - name: Timers
+    description: Управление таймерами для автоматического регулирования освещения
+
+paths:
+  # ==================== DEVICES ====================
+  /devices:
+    get:
+      tags:
+        - Devices
+      summary: Получить список всех устройств
+      responses:
+        '200':
+          description: Список устройств
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+    
+    post:
+      tags:
+        - Devices
+      summary: Создать новое устройство
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/TCPDeviceInput'
+                - $ref: '#/components/schemas/RTUDeviceInput'
+      responses:
+        '201':
+          description: Устройство успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Неверные параметры
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /devices/{name}:
+    get:
+      tags:
+        - Devices
+      summary: Получить информацию об устройстве
+      parameters:
+        - $ref: '#/components/parameters/DeviceName'
+      responses:
+        '200':
+          description: Информация об устройстве
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Устройство не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    patch:
+      tags:
+        - Devices
+      summary: Частично обновить параметры устройства
+      parameters:
+        - $ref: '#/components/parameters/DeviceName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timeout:
+                  type: integer
+                  description: Таймаут соединения (мс)
+                port:
+                  type: string
+                  description: Порт TCP (только для TCP)
+                host:
+                  type: string
+                  description: IP адрес (только для TCP)
+                path:
+                  type: string
+                  description: Путь к serial порту (только для RTU)
+                baudRate:
+                  type: integer
+                  description: Скорость передачи (только для RTU)
+                dataBits:
+                  type: integer
+                  description: Биты данных (только для RTU)
+                stopBits:
+                  type: integer
+                  description: Стоп-биты (только для RTU)
+                parity:
+                  type: string
+                  enum: [none, even, odd]
+                  description: Четность (только для RTU)
+                unitId:
+                  type: integer
+                  description: Unit ID (только для RTU)
+      responses:
+        '200':
+          description: Устройство обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Устройство не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    put:
+      tags:
+        - Devices
+      summary: Полностью заменить устройство
+      parameters:
+        - $ref: '#/components/parameters/DeviceName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/TCPDeviceInput'
+                - $ref: '#/components/schemas/RTUDeviceInput'
+      responses:
+        '200':
+          description: Устройство заменено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Неверные параметры
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Устройство не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    delete:
+      tags:
+        - Devices
+      summary: Удалить устройство
+      parameters:
+        - $ref: '#/components/parameters/DeviceName'
+      responses:
+        '200':
+          description: Устройство удалено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Устройство не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /devices/{name}/state:
+    get:
+      tags:
+        - Devices
+      summary: Получить состояние портов устройства
+      parameters:
+        - $ref: '#/components/parameters/DeviceName'
+      responses:
+        '200':
+          description: Состояние портов устройства
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  state:
+                    type: array
+                    items:
+                      type: integer
+                    description: Массив значений портов
+        '404':
+          description: Устройство не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ==================== LIGHT CHANNELS ====================
+  /lightChannels:
+    get:
+      tags:
+        - Light Channels
+      summary: Получить список всех световых каналов
+      responses:
+        '200':
+          description: Список каналов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LightChannel'
+    
+    post:
+      tags:
+        - Light Channels
+      summary: Создать новый световой канал
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - device
+                - port
+              properties:
+                name:
+                  type: string
+                  description: Название канала
+                device:
+                  type: string
+                  description: Название устройства
+                port:
+                  type: integer
+                  description: Номер порта на устройстве
+      responses:
+        '201':
+          description: Канал успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Неверные параметры
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /lightChannels/state:
+    get:
+      tags:
+        - Light Channels
+      summary: Получить состояние всех каналов
+      responses:
+        '200':
+          description: Состояние всех каналов
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+        '404':
+          description: Каналы не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /lightChannels/{name}:
+    get:
+      tags:
+        - Light Channels
+      summary: Получить информацию о канале
+      parameters:
+        - $ref: '#/components/parameters/ChannelName'
+      responses:
+        '200':
+          description: Информация о канале
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LightChannel'
+        '404':
+          description: Канал не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    patch:
+      tags:
+        - Light Channels
+      summary: Частично обновить параметры канала
+      parameters:
+        - $ref: '#/components/parameters/ChannelName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maxLevel:
+                  type: integer
+                  description: Максимальный уровень яркости
+                minLevel:
+                  type: integer
+                  description: Минимальный уровень регулирования (для нечувствительных светильников)
+                port:
+                  type: integer
+                  description: Номер порта на устройстве
+      responses:
+        '200':
+          description: Канал обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Канал не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    put:
+      tags:
+        - Light Channels
+      summary: Полностью заменить канал
+      parameters:
+        - $ref: '#/components/parameters/ChannelName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - device
+                - port
+              properties:
+                device:
+                  type: string
+                  description: Название устройства
+                port:
+                  type: integer
+                  description: Номер порта на устройстве
+                maxLevel:
+                  type: integer
+                  description: Максимальный уровень яркости
+                minLevel:
+                  type: integer
+                  description: Минимальный уровень регулирования
+      responses:
+        '200':
+          description: Канал заменен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Неверные параметры
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Канал не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    delete:
+      tags:
+        - Light Channels
+      summary: Удалить канал
+      parameters:
+        - $ref: '#/components/parameters/ChannelName'
+      responses:
+        '200':
+          description: Канал удален
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Канал не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /lightChannels/{name}/state:
+    get:
+      tags:
+        - Light Channels
+      summary: Получить состояние канала
+      parameters:
+        - $ref: '#/components/parameters/ChannelName'
+      responses:
+        '200':
+          description: Состояние канала
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  state:
+                    type: integer
+                    description: Текущее значение канала
+        '404':
+          description: Канал не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ==================== TIMERS ====================
+  /timers:
+    get:
+      tags:
+        - Timers
+      summary: Получить список всех таймеров
+      responses:
+        '200':
+          description: Список таймеров
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Timer'
+    
+    post:
+      tags:
+        - Timers
+      summary: Создать новый таймер
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: Название таймера
+                steps:
+                  type: integer
+                  description: Количество шагов регулирования
+                  default: 100
+                stepTime:
+                  type: integer
+                  description: Время одного шага в мс
+                  default: 1000
+                sunriseTime:
+                  type: string
+                  description: Время восхода (HH:MM)
+                  example: "06:00"
+                sunsetTime:
+                  type: string
+                  description: Время заката (HH:MM)
+                  example: "18:00"
+      responses:
+        '201':
+          description: Таймер успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Неверные параметры
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /timers/{name}:
+    get:
+      tags:
+        - Timers
+      summary: Получить информацию о таймере
+      parameters:
+        - $ref: '#/components/parameters/TimerName'
+      responses:
+        '200':
+          description: Информация о таймере
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Timer'
+        '404':
+          description: Таймер не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    patch:
+      tags:
+        - Timers
+      summary: Частично обновить параметры таймера
+      parameters:
+        - $ref: '#/components/parameters/TimerName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                steps:
+                  type: integer
+                  description: Количество шагов регулирования
+                stepTime:
+                  type: integer
+                  description: Время одного шага в мс
+                sunriseTime:
+                  type: string
+                  description: Время восхода (HH:MM)
+                sunsetTime:
+                  type: string
+                  description: Время заката (HH:MM)
+      responses:
+        '200':
+          description: Таймер обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Таймер не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    put:
+      tags:
+        - Timers
+      summary: Полностью заменить таймер
+      parameters:
+        - $ref: '#/components/parameters/TimerName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                steps:
+                  type: integer
+                  description: Количество шагов регулирования
+                stepTime:
+                  type: integer
+                  description: Время одного шага в мс
+                sunriseTime:
+                  type: string
+                  description: Время восхода (HH:MM)
+                sunsetTime:
+                  type: string
+                  description: Время заката (HH:MM)
+      responses:
+        '200':
+          description: Таймер заменен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Неверные параметры
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Таймер не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    
+    delete:
+      tags:
+        - Timers
+      summary: Удалить таймер
+      parameters:
+        - $ref: '#/components/parameters/TimerName'
+      responses:
+        '200':
+          description: Таймер удален
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Таймер не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /timers/{name}/subscribe:
+    post:
+      tags:
+        - Timers
+      summary: Подписать каналы на таймер
+      description: Добавляет световые каналы к таймеру для автоматического управления
+      parameters:
+        - $ref: '#/components/parameters/TimerName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channels:
+                  type: array
+                  items:
+                    type: string
+                  description: Массив названий каналов для подписки
+                  example: ["channel1", "channel2"]
+      responses:
+        '200':
+          description: Каналы подписаны
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Таймер не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /timers/{name}/unsubscribe:
+    post:
+      tags:
+        - Timers
+      summary: Отписать каналы от таймера
+      description: Удаляет световые каналы из таймера
+      parameters:
+        - $ref: '#/components/parameters/TimerName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                channels:
+                  type: array
+                  items:
+                    type: string
+                  description: Массив названий каналов для отписки
+                  example: ["channel1", "channel2"]
+      responses:
+        '200':
+          description: Каналы отписаны
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Таймер не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /timers/{name}/start:
+    post:
+      tags:
+        - Timers
+      summary: Запустить таймер
+      description: Активирует таймер для автоматического управления подписанными каналами
+      parameters:
+        - $ref: '#/components/parameters/TimerName'
+      responses:
+        '200':
+          description: Таймер запущен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Таймер не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /timers/{name}/stop:
+    post:
+      tags:
+        - Timers
+      summary: Остановить таймер
+      description: Деактивирует таймер, прекращая автоматическое управление
+      parameters:
+        - $ref: '#/components/parameters/TimerName'
+      responses:
+        '200':
+          description: Таймер остановлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Таймер не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  parameters:
+    DeviceName:
+      name: name
+      in: path
+      required: true
+      description: Название устройства
+      schema:
+        type: string
+    
+    ChannelName:
+      name: name
+      in: path
+      required: true
+      description: Название канала
+      schema:
+        type: string
+    
+    TimerName:
+      name: name
+      in: path
+      required: true
+      description: Название таймера
+      schema:
+        type: string
+
+  schemas:
+    # ==================== Common ====================
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok]
+          example: ok
+        message:
+          type: string
+          description: Дополнительное сообщение (опционально)
+    
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [error]
+          example: error
+        message:
+          type: string
+          description: Описание ошибки
+
+    # ==================== Devices ====================
+    Device:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Название устройства
+        type:
+          type: string
+          enum: [tcp, rtu]
+          description: Тип подключения
+        options:
+          oneOf:
+            - $ref: '#/components/schemas/TCPDeviceOptions'
+            - $ref: '#/components/schemas/RTUDeviceOptions'
+    
+    TCPDeviceInput:
+      type: object
+      required:
+        - name
+        - address
+      properties:
+        name:
+          type: string
+          description: Название устройства
+        type:
+          type: string
+          enum: [tcp]
+          default: tcp
+        address:
+          type: string
+          description: IP адрес устройства
+          example: "192.168.1.100"
+        port:
+          type: string
+          description: Порт Modbus TCP
+          default: "502"
+        timeout:
+          type: integer
+          description: Таймаут соединения в мс
+          default: 1000
+        portsCount:
+          type: integer
+          description: Количество портов на устройстве
+          default: 8
+    
+    RTUDeviceInput:
+      type: object
+      required:
+        - name
+        - type
+        - path
+      properties:
+        name:
+          type: string
+          description: Название устройства
+        type:
+          type: string
+          enum: [rtu]
+        path:
+          type: string
+          description: Путь к serial порту
+          example: "/dev/ttyUSB0"
+        baudRate:
+          type: integer
+          description: Скорость передачи данных
+          default: 9600
+        dataBits:
+          type: integer
+          description: Количество бит данных
+          default: 8
+          enum: [7, 8]
+        stopBits:
+          type: integer
+          description: Количество стоп-бит
+          default: 1
+          enum: [1, 2]
+        parity:
+          type: string
+          description: Контроль четности
+          default: none
+          enum: [none, even, odd]
+        unitId:
+          type: integer
+          description: ID устройства на шине
+          default: 1
+        timeout:
+          type: integer
+          description: Таймаут соединения в мс
+          default: 1000
+        portsCount:
+          type: integer
+          description: Количество портов на устройстве
+          default: 8
+    
+    TCPDeviceOptions:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [tcp]
+        host:
+          type: string
+          description: IP адрес устройства
+        port:
+          type: string
+          description: Порт Modbus TCP
+        timeout:
+          type: integer
+          description: Таймаут соединения в мс
+        portsCount:
+          type: integer
+          description: Количество портов
+    
+    RTUDeviceOptions:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [rtu]
+        path:
+          type: string
+          description: Путь к serial порту
+        baudRate:
+          type: integer
+          description: Скорость передачи
+        dataBits:
+          type: integer
+          description: Биты данных
+        stopBits:
+          type: integer
+          description: Стоп-биты
+        parity:
+          type: string
+          description: Четность
+        unitId:
+          type: integer
+          description: Unit ID
+        timeout:
+          type: integer
+          description: Таймаут в мс
+        portsCount:
+          type: integer
+          description: Количество портов
+
+    # ==================== Light Channels ====================
+    LightChannel:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Название канала
+        device:
+          type: string
+          description: Название устройства
+        port:
+          type: integer
+          description: Номер порта на устройстве
+        maxLevel:
+          type: integer
+          description: Максимальный уровень яркости (регистр Modbus)
+        minLevel:
+          type: integer
+          description: Минимальный уровень регулирования - стартовое значение при включении (для нечувствительных светильников)
+          default: 0
+        manual:
+          type: boolean
+          description: Ручной режим управления
+
+    # ==================== Timers ====================
+    Timer:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Название таймера
+        steps:
+          type: integer
+          description: Количество шагов регулирования
+        stepTime:
+          type: integer
+          description: Время одного шага в мс
+        sunriseTime:
+          type: string
+          description: Время восхода (HH:MM)
+        sunsetTime:
+          type: string
+          description: Время заката (HH:MM)
+        channels:
+          type: array
+          items:
+            type: string
+          description: Массив названий подписанных каналов
+        isRunning:
+          type: boolean
+          description: Активен ли таймер
