@@ -1,5 +1,6 @@
 import TimerManager from '../models/TimerManager.js';
 import ChannelsManager from '../models/ChannelsManager.js';
+import DeviceManager from '../models/DeviceManager.js';
 import logger from '../config/logger.js';
 
 /**
@@ -7,7 +8,8 @@ import logger from '../config/logger.js';
  */
 class TimerService {
   constructor() {
-    this.channelManager = ChannelsManager.getInstance();
+    this.deviceManager = DeviceManager.getInstance();
+    this.channelManager = ChannelsManager.getInstance(this.deviceManager);
     this.timerManager = TimerManager.getInstance(this.channelManager);
   }
 

@@ -17,6 +17,9 @@ class ChannelsManager extends EventEmitter {
   static getInstance(deviceManager) {
     if (!ChannelsManager.instance) {
       ChannelsManager.instance = new ChannelsManager(deviceManager);
+    } else if (deviceManager && !ChannelsManager.instance.deviceManager) {
+      // Обновляем deviceManager если он не был установлен ранее
+      ChannelsManager.instance.deviceManager = deviceManager;
     }
     return ChannelsManager.instance;
   }
@@ -61,6 +64,9 @@ class ChannelsManager extends EventEmitter {
       }
       if (port === undefined || port === null) {
         throw new Error("Port is required");
+      }
+      if (!this.deviceManager) {
+        throw new Error("DeviceManager is not initialized. ChannelsManager must be initialized with a DeviceManager instance.");
       }
       if (!this.deviceManager.getDevice(deviceName)) {
         throw new Error("Device not found");
