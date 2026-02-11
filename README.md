@@ -26,59 +26,66 @@ cp .env.example .env
 
 ### Переменные среды
 
-| Переменная | Описание | Значение по умолчанию |
-|-----------|----------|----------------------|
-| `PORT` | Порт HTTP сервера | `3000` |
-| `WS_PORT` | Порт WebSocket сервера | `3001` |
-| `STORAGE_DEVICES` | Путь к хранилищу устройств | `./storage/devices` |
-| `STORAGE_CHANNELS` | Путь к хранилищу каналов | `./storage/channels` |
-| `STORAGE_TIMERS` | Путь к хранилищу таймеров | `./storage/timers` |
-| `LOG_LEVEL` | Уровень логирования (error, warn, info, debug) | `info` |
-| `LOKI_HOST` | URL Grafana Loki для отправки логов (опционально) | - |
+| Переменная         | Описание                                          | Значение по умолчанию |
+| ------------------ | ------------------------------------------------- | --------------------- |
+| `PORT`             | Порт HTTP сервера                                 | `3000`                |
+| `WS_PORT`          | Порт WebSocket сервера                            | `3001`                |
+| `STORAGE_DEVICES`  | Путь к хранилищу устройств                        | `./storage/devices`   |
+| `STORAGE_CHANNELS` | Путь к хранилищу каналов                          | `./storage/channels`  |
+| `STORAGE_TIMERS`   | Путь к хранилищу таймеров                         | `./storage/timers`    |
+| `LOG_LEVEL`        | Уровень логирования (error, warn, info, debug)    | `info`                |
+| `LOKI_HOST`        | URL Grafana Loki для отправки логов (опционально) | -                     |
 
 ### Логирование
 
 Приложение использует Winston для логирования с поддержкой Grafana Loki.
 
 **Уровни логирования:**
+
 - `error` - только ошибки
 - `warn` - предупреждения и ошибки
 - `info` - информационные сообщения (по умолчанию)
 - `debug` - подробные логи для отладки
 
 **Транспорты:**
+
 - Console - вывод в консоль (всегда включен)
 - File - файлы `logs/error.log` и `logs/combined.log` (только в production)
 - Loki - отправка в Grafana Loki (если указан `LOKI_HOST`)
 
 **Пример настройки Loki:**
+
 ```env
 LOKI_HOST=http://localhost:3100
 LOG_LEVEL=debug
 ```
 
 **Использование в коде:**
-```javascript
-import logger from './config/logger.js';
 
-logger.info('Server started', { port: 3000 });
-logger.error('Connection failed', { error: err.message });
-logger.debug('Processing request', { requestId: '123' });
+```javascript
+import logger from "./config/logger.js";
+
+logger.info("Server started", { port: 3000 });
+logger.error("Connection failed", { error: err.message });
+logger.debug("Processing request", { requestId: "123" });
 ```
 
 ## Запуск
 
 ### Разработка
+
 ```bash
 npm run dev
 ```
 
 ### Production
+
 ```bash
 npm start
 ```
 
 ### Тесты
+
 ```bash
 npm test                # Запуск всех тестов
 npm run test:watch      # Запуск в режиме watch
@@ -96,6 +103,7 @@ npm run test:coverage   # Запуск с отчетом о покрытии
 **Порт:** WebSocket работает на отдельном порту (по умолчанию 3001), настраивается через переменную `WS_PORT`.
 
 **События:**
+
 - `connected` - успешное подключение
 - `channel_update` - обновление состояния канала
 - `channel_added` - добавление нового канала
@@ -104,13 +112,14 @@ npm run test:coverage   # Запуск с отчетом о покрытии
 Подробная документация: [docs/WEBSOCKET.md](docs/WEBSOCKET.md)
 
 **Пример подключения:**
+
 ```javascript
-const ws = new WebSocket('ws://localhost:3001/ws/channels');
+const ws = new WebSocket("ws://localhost:3001/ws/channels");
 
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
-  if (data.type === 'channel_update') {
-    console.log('Канал обновлен:', data.channel, data.state);
+  if (data.type === "channel_update") {
+    console.log("Канал обновлен:", data.channel, data.state);
   }
 };
 ```
@@ -120,21 +129,25 @@ ws.onmessage = (event) => {
 ### Устройства
 
 #### Получить список устройств
+
 ```
 GET /api/devices
 ```
 
 #### Получить устройство по имени
+
 ```
 GET /api/devices/:name
 ```
 
 #### Получить состояние устройства
+
 ```
 GET /api/devices/:name/state
 ```
 
 #### Добавить TCP устройство
+
 ```
 POST /api/devices/add
 Content-Type: application/json
@@ -150,6 +163,7 @@ Content-Type: application/json
 ```
 
 #### Добавить RTU устройство
+
 ```
 POST /api/devices/add
 Content-Type: application/json
@@ -169,6 +183,7 @@ Content-Type: application/json
 ```
 
 #### Обновить параметры устройства
+
 ```
 PATCH /api/devices/:name
 Content-Type: application/json
@@ -182,6 +197,7 @@ Content-Type: application/json
 ```
 
 #### Удалить устройство
+
 ```
 DELETE /api/devices/:name
 ```

@@ -7,6 +7,7 @@ WebSocket API позволяет клиентам получать обновл�
 ## Подключение
 
 ### Endpoint
+
 ```
 ws://localhost:3001/ws/channels
 ```
@@ -14,48 +15,50 @@ ws://localhost:3001/ws/channels
 **Примечание:** WebSocket работает на отдельном порту (по умолчанию 3001), который можно настроить через переменную окружения `WS_PORT`.
 
 ### Пример подключения (JavaScript)
+
 ```javascript
-const ws = new WebSocket('ws://localhost:3001/ws/channels');
+const ws = new WebSocket("ws://localhost:3001/ws/channels");
 
 ws.onopen = () => {
-  console.log('Подключено к серверу');
+  console.log("Подключено к серверу");
 };
 
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
-  console.log('Получено сообщение:', data);
-  
-  switch(data.type) {
-    case 'connected':
-      console.log('Успешное подключение');
+  console.log("Получено сообщение:", data);
+
+  switch (data.type) {
+    case "connected":
+      console.log("Успешное подключение");
       break;
-    case 'channel_update':
-      console.log('Обновление канала:', data.channel, data.state);
+    case "channel_update":
+      console.log("Обновление канала:", data.channel, data.state);
       break;
-    case 'channel_added':
-      console.log('Добавлен новый канал:', data.channel);
+    case "channel_added":
+      console.log("Добавлен новый канал:", data.channel);
       break;
-    case 'channel_removed':
-      console.log('Канал удален:', data.channel);
+    case "channel_removed":
+      console.log("Канал удален:", data.channel);
       break;
-    case 'channels_state':
-      console.log('Полное состояние каналов:', data.channels);
+    case "channels_state":
+      console.log("Полное состояние каналов:", data.channels);
       break;
   }
 };
 
 ws.onerror = (error) => {
-  console.error('WebSocket ошибка:', error);
+  console.error("WebSocket ошибка:", error);
 };
 
 ws.onclose = () => {
-  console.log('Соединение закрыто');
+  console.log("Соединение закрыто");
 };
 ```
 
 ## Типы сообщений от сервера
 
 ### 1. Connected (приветственное сообщение)
+
 Отправляется сразу после установки соединения.
 
 ```json
@@ -67,6 +70,7 @@ ws.onclose = () => {
 ```
 
 ### 2. Channel Update (обновление состояния канала)
+
 Отправляется когда изменяется состояние канала (яркость, уровни и т.д.).
 
 ```json
@@ -88,6 +92,7 @@ ws.onclose = () => {
 ```
 
 ### 3. Channel Added (добавление нового канала)
+
 Отправляется когда создается новый канал.
 
 ```json
@@ -106,6 +111,7 @@ ws.onclose = () => {
 ```
 
 ### 4. Channel Removed (удаление канала)
+
 Отправляется когда канал удаляется.
 
 ```json
@@ -117,6 +123,7 @@ ws.onclose = () => {
 ```
 
 ### 5. Channels State (полное состояние всех каналов)
+
 Может быть отправлено для синхронизации полного состояния.
 
 ```json
@@ -147,13 +154,15 @@ ws.onclose = () => {
 ## Сообщения от клиента
 
 ### Ping/Pong
+
 Клиент может отправить ping для проверки соединения:
 
 ```javascript
-ws.send(JSON.stringify({ type: 'ping' }));
+ws.send(JSON.stringify({ type: "ping" }));
 ```
 
 Ответ от сервера:
+
 ```json
 {
   "type": "pong",
@@ -164,46 +173,46 @@ ws.send(JSON.stringify({ type: 'ping' }));
 ## Пример использования с React
 
 ```javascript
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 function ChannelsMonitor() {
   const [channels, setChannels] = useState({});
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:3001/ws/channels');
+    const ws = new WebSocket("ws://localhost:3001/ws/channels");
 
     ws.onopen = () => {
       setConnected(true);
-      console.log('WebSocket подключен');
+      console.log("WebSocket подключен");
     };
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
-      switch(data.type) {
-        case 'channel_update':
-          setChannels(prev => ({
+      switch (data.type) {
+        case "channel_update":
+          setChannels((prev) => ({
             ...prev,
-            [data.channel]: data.state
+            [data.channel]: data.state,
           }));
           break;
-        case 'channel_added':
-          setChannels(prev => ({
+        case "channel_added":
+          setChannels((prev) => ({
             ...prev,
-            [data.channel.name]: data.channel
+            [data.channel.name]: data.channel,
           }));
           break;
-        case 'channel_removed':
-          setChannels(prev => {
+        case "channel_removed":
+          setChannels((prev) => {
             const newChannels = { ...prev };
             delete newChannels[data.channel];
             return newChannels;
           });
           break;
-        case 'channels_state':
+        case "channels_state":
           const channelsObj = {};
-          data.channels.forEach(ch => {
+          data.channels.forEach((ch) => {
             channelsObj[ch.name] = ch;
           });
           setChannels(channelsObj);
@@ -212,12 +221,12 @@ function ChannelsMonitor() {
     };
 
     ws.onerror = (error) => {
-      console.error('WebSocket ошибка:', error);
+      console.error("WebSocket ошибка:", error);
       setConnected(false);
     };
 
     ws.onclose = () => {
-      console.log('WebSocket закрыт');
+      console.log("WebSocket закрыт");
       setConnected(false);
     };
 
@@ -229,7 +238,9 @@ function ChannelsMonitor() {
 
   return (
     <div>
-      <h2>Состояние соединения: {connected ? '✅ Подключено' : '❌ Отключено'}</h2>
+      <h2>
+        Состояние соединения: {connected ? "✅ Подключено" : "❌ Отключено"}
+      </h2>
       <h3>Каналы:</h3>
       <ul>
         {Object.entries(channels).map(([name, state]) => (
@@ -283,6 +294,7 @@ console.log(`Подключено клиентов: ${clientCount}`);
 ```
 
 Логи WebSocket событий записываются через Winston logger с метками:
+
 - `info`: подключение/отключение клиентов
 - `debug`: отправка сообщений broadcast
 - `error`: ошибки соединения или отправки сообщений

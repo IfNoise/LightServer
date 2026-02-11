@@ -7,11 +7,13 @@ WebSocket сервер теперь работает на **отдельном �
 ### Что изменилось
 
 **Раньше:**
+
 - WebSocket: `ws://localhost:3000/api/ws/channels`
 - REST API: `http://localhost:3000/api`
 
 **Теперь:**
-- WebSocket: `ws://localhost:3001/ws/channels` 
+
+- WebSocket: `ws://localhost:3001/ws/channels`
 - REST API: `http://localhost:3000/api`
 
 ### Преимущества
@@ -34,18 +36,20 @@ WS_PORT=3001   # WebSocket сервер
 ### 2. Обновить клиентский код
 
 **JavaScript:**
+
 ```javascript
 // Старый код
-const ws = new WebSocket('ws://localhost:3000/api/ws/channels');
+const ws = new WebSocket("ws://localhost:3000/api/ws/channels");
 
 // Новый код
-const ws = new WebSocket('ws://localhost:3001/ws/channels');
+const ws = new WebSocket("ws://localhost:3001/ws/channels");
 ```
 
 **React:**
+
 ```javascript
 // Обновить константу с URL
-const WS_URL = 'ws://localhost:3001/ws/channels';
+const WS_URL = "ws://localhost:3001/ws/channels";
 ```
 
 ### 3. Обновить файрвол / прокси
@@ -53,6 +57,7 @@ const WS_URL = 'ws://localhost:3001/ws/channels';
 Если вы используете nginx или другой прокси-сервер, обновите конфигурацию:
 
 **nginx пример:**
+
 ```nginx
 # REST API
 location /api {
@@ -77,8 +82,8 @@ location /ws {
 services:
   lightserver:
     ports:
-      - "3000:3000"  # REST API
-      - "3001:3001"  # WebSocket
+      - "3000:3000" # REST API
+      - "3001:3001" # WebSocket
     environment:
       - PORT=3000
       - WS_PORT=3001
@@ -87,17 +92,20 @@ services:
 ## Тестирование
 
 1. Запустите сервер:
+
    ```bash
    npm run dev
    ```
 
 2. Убедитесь, что оба порта запущены:
+
    ```
    2026-02-11 19:41:37 [info]: Server app listening at 3000 port
    2026-02-11 19:41:37 [info]: WebSocket server listening {"port":3001,"path":"/ws/channels"}
    ```
 
 3. Откройте тестовый клиент в браузере:
+
    ```
    file:///path/to/docs/websocket-test-client.html
    ```
@@ -120,7 +128,9 @@ WS_PORT=3000
 ### Ошибка "address already in use"
 
 Если порт занят:
+
 1. Проверьте, какой процесс использует порт:
+
    ```bash
    lsof -i :3001
    # или
@@ -142,6 +152,7 @@ WS_PORT=3000
 ## Поддержка
 
 При возникновении проблем:
+
 1. Проверьте логи сервера
 2. Используйте [docs/websocket-test-client.html](websocket-test-client.html) для тестирования
 3. Обратитесь к [docs/WEBSOCKET.md](WEBSOCKET.md) за подробной документацией

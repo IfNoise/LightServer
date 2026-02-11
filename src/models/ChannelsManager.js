@@ -8,7 +8,9 @@ class ChannelsManager extends EventEmitter {
   constructor(deviceManager) {
     super();
     this.channels = [];
-    this.localStorage = new LocalStorage(process.env.STORAGE_CHANNELS || "./storage/channels");
+    this.localStorage = new LocalStorage(
+      process.env.STORAGE_CHANNELS || "./storage/channels",
+    );
     this.deviceManager = deviceManager;
   }
 
@@ -66,19 +68,22 @@ class ChannelsManager extends EventEmitter {
       const device = this.deviceManager.getDevice(deviceName);
       const newChannel = new LightChannel(name, device, port);
       newChannel.init();
-      
+
       // Подписываемся на события канала
       this.subscribeToChannelEvents(newChannel);
-      
+
       this.channels.push(newChannel);
       this.saveChannels();
-      
+
       // Эмитим событие добавления канала
-      this.emit('channel:added', newChannel.json());
-      
+      this.emit("channel:added", newChannel.json());
+
       return { status: "ok" };
     } catch (e) {
-      logger.error("Failed to add channel", { channel: channel.name, error: e.message });
+      logger.error("Failed to add channel", {
+        channel: channel.name,
+        error: e.message,
+      });
       return { status: "error", message: e.message };
     }
   }
@@ -89,19 +94,22 @@ class ChannelsManager extends EventEmitter {
       if (!channel) {
         throw new Error("Channel not found");
       }
-      
+
       // Отписываемся от событий канала
       channel.removeAllListeners();
-      
+
       this.channels = this.channels.filter((c) => c.name !== name);
       this.saveChannels();
-      
+
       // Эмитим событие удаления канала
-      this.emit('channel:removed', name);
-      
+      this.emit("channel:removed", name);
+
       return { status: "ok" };
     } catch (e) {
-      logger.error("Failed to remove channel", { channel: name, error: e.message });
+      logger.error("Failed to remove channel", {
+        channel: name,
+        error: e.message,
+      });
       return { status: "error", message: e.message };
     }
   }
@@ -136,7 +144,7 @@ class ChannelsManager extends EventEmitter {
       this.channels.map(async (channel) => {
         const state = await channel.getState();
         return { name: channel.name, state };
-      })
+      }),
     );
     return state;
   }
@@ -146,8 +154,8 @@ class ChannelsManager extends EventEmitter {
    * @param {LightChannel} channel - Канал для подписки
    */
   subscribeToChannelEvents(channel) {
-    channel.on('state:changed', (state) => {
-      this.emit('channel:updated', { name: channel.name, state });
+    channel.on("state:changed", (state) => {
+      this.emit("channel:updated", { name: channel.name, state });
     });
   }
 
@@ -157,7 +165,7 @@ class ChannelsManager extends EventEmitter {
   loadChannelsWithEvents() {
     this.loadChannels();
     // Подписываемся на события всех загруженных каналов
-    this.channels.forEach(channel => {
+    this.channels.forEach((channel) => {
       this.subscribeToChannelEvents(channel);
     });
   }

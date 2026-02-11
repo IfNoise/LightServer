@@ -31,7 +31,10 @@ class LightChannel extends EventEmitter {
       this.device = device;
       return { status: "ok" };
     } catch (e) {
-      logger.error("Failed to set device for channel", { channel: this.name, error: e.message });
+      logger.error("Failed to set device for channel", {
+        channel: this.name,
+        error: e.message,
+      });
       return { status: "error", message: e.message };
     }
   }
@@ -44,7 +47,10 @@ class LightChannel extends EventEmitter {
       this.localStorage.setItem("port", port);
       return { status: "ok" };
     } catch (e) {
-      logger.error("Failed to set port for channel", { channel: this.name, error: e.message });
+      logger.error("Failed to set port for channel", {
+        channel: this.name,
+        error: e.message,
+      });
       return { status: "error", message: e.message };
     }
   }
@@ -63,20 +69,27 @@ class LightChannel extends EventEmitter {
       // Округляем до целого числа для Modbus регистров
       this.minLevel = Math.round(minLevel);
       this.localStorage.setItem("minLevel", this.minLevel);
-      
-      logger.debug(`MinLevel changed for channel`, { channel: this.name, oldMinLevel, newMinLevel: this.minLevel });
-      
+
+      logger.debug(`MinLevel changed for channel`, {
+        channel: this.name,
+        oldMinLevel,
+        newMinLevel: this.minLevel,
+      });
+
       // Пересчитываем и обновляем уровень на устройстве
       if (this.currentPercentage !== undefined) {
         await this.setPersentage(this.currentPercentage);
       }
-      
+
       // Эмитим событие изменения состояния
       this.emitStateChanged();
-      
+
       return { status: "ok" };
     } catch (e) {
-      logger.error("Failed to set minLevel for channel", { channel: this.name, error: e.message });
+      logger.error("Failed to set minLevel for channel", {
+        channel: this.name,
+        error: e.message,
+      });
       return { status: "error", message: e.message };
     }
   }
@@ -89,22 +102,29 @@ class LightChannel extends EventEmitter {
       // Округляем до целого числа для Modbus регистров
       this.maxLevel = Math.round(maxLevel);
       this.localStorage.setItem("maxLevel", this.maxLevel);
-      
-      logger.debug(`MaxLevel changed for channel`, { channel: this.name, oldMaxLevel, newMaxLevel: this.maxLevel });
-      
+
+      logger.debug(`MaxLevel changed for channel`, {
+        channel: this.name,
+        oldMaxLevel,
+        newMaxLevel: this.maxLevel,
+      });
+
       // Пересчитываем и обновляем уровень на устройстве
       if (this.currentPercentage !== undefined) {
         await this.setPersentage(this.currentPercentage);
       } else if (this.manual) {
         await this.setPersentage(100);
       }
-      
+
       // Эмитим событие изменения состояния
       this.emitStateChanged();
-      
+
       return { status: "ok" };
     } catch (e) {
-      logger.error("Failed to set maxLevel for channel", { channel: this.name, error: e.message });
+      logger.error("Failed to set maxLevel for channel", {
+        channel: this.name,
+        error: e.message,
+      });
       return { status: "error", message: e.message };
     }
   }
@@ -116,19 +136,24 @@ class LightChannel extends EventEmitter {
       if (persentage < 0 || persentage > 100) {
         throw new Error("Persentage must be between 0 and 100");
       }
-      
+
       if (!this.device) {
         throw new Error("Device not set");
       }
-      
+
       if (this.maxLevel === 0) {
-        logger.warn(`Channel has maxLevel=0, cannot calculate brightness`, { channel: this.name });
-        return { status: "error", message: "maxLevel is 0, cannot set brightness" };
+        logger.warn(`Channel has maxLevel=0, cannot calculate brightness`, {
+          channel: this.name,
+        });
+        return {
+          status: "error",
+          message: "maxLevel is 0, cannot set brightness",
+        };
       }
-      
+
       // Сохраняем текущий процент для пересчета при изменении maxLevel
       this.currentPercentage = persentage;
-      
+
       let newLevel;
       if (persentage === 0) {
         // Полностью выключено
@@ -136,22 +161,26 @@ class LightChannel extends EventEmitter {
       } else {
         // Масштабируем от minLevel до maxLevel
         // При percentage=1 получим minLevel, при percentage=100 получим maxLevel
-        newLevel = this.minLevel + ((this.maxLevel - this.minLevel) * persentage) / 100;
+        newLevel =
+          this.minLevel + ((this.maxLevel - this.minLevel) * persentage) / 100;
       }
-      
+
       // Всегда обновляем устройство, даже если level не изменился
       // (реальное состояние устройства могло быть изменено извне)
       // Округляем level до целого числа
       this.level = Math.round(newLevel);
-      
+
       const res = await this.device.updatePort(this.port, this.level);
-      
+
       // Эмитим событие изменения состояния
       this.emitStateChanged();
-      
+
       return { status: "ok" };
     } catch (e) {
-      logger.error(`Channel setPersentage error`, { channel: this.name, error: e.message });
+      logger.error(`Channel setPersentage error`, {
+        channel: this.name,
+        error: e.message,
+      });
       return { status: "error", message: e.message };
     }
   }
@@ -174,7 +203,10 @@ class LightChannel extends EventEmitter {
       const ports = await this.device.requestState();
       return ports[this.port];
     } catch (e) {
-      logger.error("Failed to get channel state", { channel: this.name, error: e.message });
+      logger.error("Failed to get channel state", {
+        channel: this.name,
+        error: e.message,
+      });
       return { status: "error", message: e.message };
     }
   }
@@ -191,10 +223,10 @@ class LightChannel extends EventEmitter {
       minLevel: this.minLevel,
       manual: this.manual,
       device: this.device?.name || "",
-      port: this.port
+      port: this.port,
     };
-    this.emit('state:changed', state);
-    logger.debug('Channel state changed', { channel: this.name, state });
+    this.emit("state:changed", state);
+    logger.debug("Channel state changed", { channel: this.name, state });
   }
 }
 
