@@ -1,4 +1,4 @@
-import ModbusDevice from '../models/ModbusDevice.js';
+import ModbusDevice from '../src/models/ModbusDevice.js';
 
 // Mock dependencies
 jest.mock('net');

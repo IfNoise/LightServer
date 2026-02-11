@@ -2,8 +2,10 @@ module.exports = {
   testEnvironment: 'node',
   coverageDirectory: 'coverage',
   collectCoverageFrom: [
-    'models/**/*.js',
-    'routes/**/*.js',
+    'src/models/**/*.js',
+    'src/services/**/*.js',
+    'src/controllers/**/*.js',
+    'src/routes/**/*.js',
     '!**/node_modules/**',
   ],
   testMatch: [
@@ -12,4 +14,6 @@ module.exports = {
   ],
   verbose: true,
   testTimeout: 10000,
+  transform: {},
+  injectGlobals: true,
 };

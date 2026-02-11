@@ -1,10 +1,10 @@
-import ChannelsManager from '../models/ChannelsManager.js';
-import LightChannel from '../models/LightChannel.js';
+import ChannelsManager from '../src/models/ChannelsManager.js';
+import LightChannel from '../src/models/LightChannel.js';
 import { LocalStorage } from 'node-localstorage';
 
 // Mock dependencies
 jest.mock('node-localstorage');
-jest.mock('../models/LightChannel');
+jest.mock('../src/models/LightChannel');
 
 describe('ChannelsManager', () => {
   let channelsManager;

@@ -1,10 +1,10 @@
-import TimerManager from '../models/TimerManager.js';
-import { Timer } from '../models/Timer.js';
+import TimerManager from '../src/models/TimerManager.js';
+import { Timer } from '../src/models/Timer.js';
 import { LocalStorage } from 'node-localstorage';
 
 // Mock dependencies
 jest.mock('node-localstorage');
-jest.mock('../models/Timer');
+jest.mock('../src/models/Timer');
 
 describe('TimerManager', () => {
   let timerManager;

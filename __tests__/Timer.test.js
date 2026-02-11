@@ -1,4 +1,4 @@
-import { Timer, TIMER_STATES, DAY_PERIODS, CONSTANTS } from '../models/Timer.js';
+import { Timer, TIMER_STATES, DAY_PERIODS, CONSTANTS } from '../src/models/Timer.js';
 
 // Mock localStorage
 jest.mock('node-localstorage', () => {

@@ -16,19 +16,19 @@ const mockTimerManager = {
   unsubscribe: jest.fn(),
 };
 
-jest.mock('../models/ChannelsManager.js', () => ({
+jest.mock('../src/models/ChannelsManager.js', () => ({
   default: {
     getInstance: jest.fn(() => ({}))
   }
 }));
 
-jest.mock('../models/TimerManager.js', () => ({
+jest.mock('../src/models/TimerManager.js', () => ({
   default: {
     getInstance: jest.fn(() => mockTimerManager)
   }
 }));
 
-import timersRoute from '../routes/timers.route.js';
+import timersRoute from '../src/routes/timers.route.js';
 
 describe('Timers API', () => {
   let app;

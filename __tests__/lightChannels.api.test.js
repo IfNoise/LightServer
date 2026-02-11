@@ -16,19 +16,19 @@ const mockChannelsManager = {
   channels: [],
 };
 
-jest.mock('../models/DeviceManager.js', () => ({
+jest.mock('../src/models/DeviceManager.js', () => ({
   default: {
     getInstance: jest.fn(() => ({}))
   }
 }));
 
-jest.mock('../models/ChannelsManager.js', () => ({
+jest.mock('../src/models/ChannelsManager.js', () => ({
   default: {
     getInstance: jest.fn(() => mockChannelsManager)
   }
 }));
 
-import lightChannelsRoute from '../routes/lightChannels.route.js';
+import lightChannelsRoute from '../src/routes/lightChannels.route.js';
 
 describe('LightChannels API', () => {
   let app;

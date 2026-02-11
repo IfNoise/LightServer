@@ -16,13 +16,13 @@ const mockDeviceManager = {
   saveDevices: jest.fn(),
 };
 
-jest.mock('../models/DeviceManager.js', () => ({
+jest.mock('../src/models/DeviceManager.js', () => ({
   default: {
     getInstance: jest.fn(() => mockDeviceManager)
   }
 }));
 
-import devicesRoute from '../routes/devices.route.js';
+import devicesRoute from '../src/routes/devices.route.js';
 
 describe('Devices API', () => {
   let app;

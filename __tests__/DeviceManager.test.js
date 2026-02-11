@@ -1,10 +1,10 @@
-import DeviceManager from '../models/DeviceManager.js';
-import ModbusDevice from '../models/ModbusDevice.js';
+import DeviceManager from '../src/models/DeviceManager.js';
+import ModbusDevice from '../src/models/ModbusDevice.js';
 import { LocalStorage } from 'node-localstorage';
 
 // Mock dependencies
 jest.mock('node-localstorage');
-jest.mock('../models/ModbusDevice');
+jest.mock('../src/models/ModbusDevice');
 
 describe('DeviceManager', () => {
   let deviceManager;

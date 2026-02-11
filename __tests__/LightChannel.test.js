@@ -1,4 +1,4 @@
-import LightChannel from "../models/LightChannel.js";
+import LightChannel from "../src/models/LightChannel.js";
 
 // Mock localStorage
 jest.mock("node-localstorage", () => {
