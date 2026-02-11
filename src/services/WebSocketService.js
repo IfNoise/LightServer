@@ -30,7 +30,6 @@ class WebSocketService {
       server.listen(port, () => {
         logger.info("WebSocket server listening", {
           port,
-          path: "/ws/channels",
         });
       });
     }
