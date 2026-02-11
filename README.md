@@ -29,6 +29,7 @@ cp .env.example .env
 | Переменная | Описание | Значение по умолчанию |
 |-----------|----------|----------------------|
 | `PORT` | Порт HTTP сервера | `3000` |
+| `WS_PORT` | Порт WebSocket сервера | `3001` |
 | `STORAGE_DEVICES` | Путь к хранилищу устройств | `./storage/devices` |
 | `STORAGE_CHANNELS` | Путь к хранилищу каналов | `./storage/channels` |
 | `STORAGE_TIMERS` | Путь к хранилищу таймеров | `./storage/timers` |
@@ -85,6 +86,36 @@ npm run test:coverage   # Запуск с отчетом о покрытии
 ```
 
 ## API
+
+### WebSocket
+
+Сервер поддерживает WebSocket для трансляции состояния каналов в реальном времени.
+
+**Endpoint:** `ws://localhost:3001/ws/channels`
+
+**Порт:** WebSocket работает на отдельном порту (по умолчанию 3001), настраивается через переменную `WS_PORT`.
+
+**События:**
+- `connected` - успешное подключение
+- `channel_update` - обновление состояния канала
+- `channel_added` - добавление нового канала
+- `channel_removed` - удаление канала
+
+Подробная документация: [docs/WEBSOCKET.md](docs/WEBSOCKET.md)
+
+**Пример подключения:**
+```javascript
+const ws = new WebSocket('ws://localhost:3001/ws/channels');
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+  if (data.type === 'channel_update') {
+    console.log('Канал обновлен:', data.channel, data.state);
+  }
+};
+```
+
+### REST API
 
 ### Устройства
 

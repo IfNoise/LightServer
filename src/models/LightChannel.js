@@ -1,8 +1,10 @@
 import { LocalStorage } from "node-localstorage";
+import { EventEmitter } from "events";
 import logger from "../config/logger.js";
 
-class LightChannel {
+class LightChannel extends EventEmitter {
   constructor(name, device, port) {
+    super();
     this.name = name;
     this.device = device;
     this.port = port;
@@ -68,6 +70,10 @@ class LightChannel {
       if (this.currentPercentage !== undefined) {
         await this.setPersentage(this.currentPercentage);
       }
+      
+      // Эмитим событие изменения состояния
+      this.emitStateChanged();
+      
       return { status: "ok" };
     } catch (e) {
       logger.error("Failed to set minLevel for channel", { channel: this.name, error: e.message });
@@ -92,6 +98,10 @@ class LightChannel {
       } else if (this.manual) {
         await this.setPersentage(100);
       }
+      
+      // Эмитим событие изменения состояния
+      this.emitStateChanged();
+      
       return { status: "ok" };
     } catch (e) {
       logger.error("Failed to set maxLevel for channel", { channel: this.name, error: e.message });
@@ -136,6 +146,9 @@ class LightChannel {
       
       const res = await this.device.updatePort(this.port, this.level);
       
+      // Эмитим событие изменения состояния
+      this.emitStateChanged();
+      
       return { status: "ok" };
     } catch (e) {
       logger.error(`Channel setPersentage error`, { channel: this.name, error: e.message });
@@ -164,6 +177,24 @@ class LightChannel {
       logger.error("Failed to get channel state", { channel: this.name, error: e.message });
       return { status: "error", message: e.message };
     }
+  }
+
+  /**
+   * Эмит события изменения состояния канала
+   */
+  emitStateChanged() {
+    const state = {
+      name: this.name,
+      level: this.level,
+      currentPercentage: this.currentPercentage,
+      maxLevel: this.maxLevel,
+      minLevel: this.minLevel,
+      manual: this.manual,
+      device: this.device?.name || "",
+      port: this.port
+    };
+    this.emit('state:changed', state);
+    logger.debug('Channel state changed', { channel: this.name, state });
   }
 }
 
