@@ -1,7 +1,7 @@
-import TimerManager from '../models/TimerManager.js';
-import ChannelsManager from '../models/ChannelsManager.js';
-import DeviceManager from '../models/DeviceManager.js';
-import logger from '../config/logger.js';
+import TimerManager from "../models/TimerManager.js";
+import ChannelsManager from "../models/ChannelsManager.js";
+import DeviceManager from "../models/DeviceManager.js";
+import logger from "../config/logger.js";
 
 /**
  * Service for managing timers business logic
@@ -40,7 +40,13 @@ class TimerService {
    * @returns {Object} Result with status
    */
   createTimer(name, steps, stepTime, sunriseTime, sunsetTime) {
-    return this.timerManager.addTimer(name, steps, stepTime, sunriseTime, sunsetTime);
+    return this.timerManager.addTimer(
+      name,
+      steps,
+      stepTime,
+      sunriseTime,
+      sunsetTime,
+    );
   }
 
   /**
@@ -54,14 +60,14 @@ class TimerService {
     if (!timer) {
       return { status: "error", message: "Timer not found" };
     }
-    
+
     const { steps, stepTime, sunriseTime, sunsetTime } = updateData;
-    
+
     if (steps !== undefined) timer.setSteps(steps);
     if (stepTime !== undefined) timer.setStepTime(stepTime);
     if (sunriseTime !== undefined) timer.setSunriseTime(sunriseTime);
     if (sunsetTime !== undefined) timer.setSunsetTime(sunsetTime);
-    
+
     this.timerManager.saveTimers();
     return { status: "ok" };
   }
@@ -77,12 +83,18 @@ class TimerService {
     if (!timer) {
       return { status: "error", message: "Timer not found" };
     }
-    
+
     const { steps, stepTime, sunriseTime, sunsetTime } = timerData;
-    
+
     // Remove and recreate timer
     this.timerManager.removeTimer(name);
-    return this.timerManager.addTimer(name, steps, stepTime, sunriseTime, sunsetTime);
+    return this.timerManager.addTimer(
+      name,
+      steps,
+      stepTime,
+      sunriseTime,
+      sunsetTime,
+    );
   }
 
   /**
@@ -124,7 +136,7 @@ class TimerService {
     if (!timer) {
       return { status: "error", message: "Timer not found" };
     }
-    
+
     timer.start();
     return { status: "ok" };
   }
@@ -139,7 +151,7 @@ class TimerService {
     if (!timer) {
       return { status: "error", message: "Timer not found" };
     }
-    
+
     timer.stop();
     return { status: "ok" };
   }
@@ -155,7 +167,7 @@ class TimerService {
     if (!timer) {
       return { status: "error", message: "Timer not found" };
     }
-    
+
     timer.setSteps(steps);
     this.timerManager.saveTimers();
     return { status: "ok" };
@@ -172,7 +184,7 @@ class TimerService {
     if (!timer) {
       return { status: "error", message: "Timer not found" };
     }
-    
+
     timer.setSunriseTime(time);
     this.timerManager.saveTimers();
     return { status: "ok" };
@@ -189,7 +201,7 @@ class TimerService {
     if (!timer) {
       return { status: "error", message: "Timer not found" };
     }
-    
+
     timer.setSunsetTime(time);
     this.timerManager.saveTimers();
     return { status: "ok" };
@@ -206,7 +218,7 @@ class TimerService {
     if (!timer) {
       return { status: "error", message: "Timer not found" };
     }
-    
+
     timer.setStepTime(stepTime);
     this.timerManager.saveTimers();
     return { status: "ok" };

@@ -8,6 +8,9 @@
     "start": "cross-env NODE_ENV=production node app.js",
     "server": "nodemon app.js",
     "dev": "cross-env NODE_ENV=development npm run server",
+    "emulator": "node emulator/modbus-emulator.js",
+    "emulator:watch": "nodemon emulator/modbus-emulator.js",
+    "dev:all": "concurrently --names \"service,emulator\" --prefix-colors \"cyan,yellow\" \"npm run dev\" \"npm run emulator:watch\"",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"

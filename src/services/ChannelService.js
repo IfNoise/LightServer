@@ -1,5 +1,5 @@
-import ChannelsManager from '../models/ChannelsManager.js';
-import DeviceManager from '../models/DeviceManager.js';
+import ChannelsManager from "../models/ChannelsManager.js";
+import DeviceManager from "../models/DeviceManager.js";
 
 /**
  * Service for managing light channels business logic
@@ -48,9 +48,9 @@ class ChannelService {
     if (!channel) {
       return { status: "error", message: "Channel not found" };
     }
-    
+
     const { maxLevel, minLevel, port } = updateData;
-    
+
     if (maxLevel !== undefined) {
       await channel.setMaxLevel(maxLevel);
     }
@@ -60,7 +60,7 @@ class ChannelService {
     if (port !== undefined) {
       channel.setPort(port);
     }
-    
+
     this.channelManager.saveChannels();
     return { status: "ok" };
   }
@@ -76,13 +76,13 @@ class ChannelService {
     if (!channel) {
       return { status: "error", message: "Channel not found" };
     }
-    
+
     const { device, port, maxLevel, minLevel } = channelData;
-    
+
     // Remove and recreate channel
     this.channelManager.removeChannel(name);
     const result = this.channelManager.addChannel({ name, device, port });
-    
+
     if (result.status === "ok") {
       const newChannel = this.channelManager.getChannel(name);
       if (newChannel) {
@@ -95,7 +95,7 @@ class ChannelService {
         this.channelManager.saveChannels();
       }
     }
-    
+
     return result;
   }
 
@@ -118,7 +118,7 @@ class ChannelService {
     if (!channel) {
       return { status: "error", message: "Channel not found" };
     }
-    
+
     const state = await channel.getState();
     return { state };
   }
@@ -131,7 +131,7 @@ class ChannelService {
     if (this.channelManager.channels.length === 0) {
       return { status: "error", message: "No channels found" };
     }
-    
+
     const state = await this.channelManager.getChannelsState();
     return state;
   }
@@ -147,7 +147,7 @@ class ChannelService {
     if (!channel) {
       return { status: "error", message: "Channel not found" };
     }
-    
+
     return await channel.setMaxLevel(maxLevel);
   }
 
@@ -162,7 +162,7 @@ class ChannelService {
     if (!channel) {
       return { status: "error", message: "Channel not found" };
     }
-    
+
     channel.setPort(port);
     return { status: "ok" };
   }
@@ -176,14 +176,14 @@ class ChannelService {
   setChannelDevice(name, deviceName) {
     const channel = this.channelManager.getChannel(name);
     const device = this.deviceManager.getDevice(deviceName);
-    
+
     if (!channel) {
       return { status: "error", message: "Channel not found" };
     }
     if (!device) {
       return { status: "error", message: "Device not found" };
     }
-    
+
     channel.setDevice(device);
     return { status: "ok" };
   }
